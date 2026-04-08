@@ -6,10 +6,12 @@ import { useCartStore } from "@/store/useCartStore";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { ArrowLeft, Check, Minus, Plus, ShoppingBag } from "lucide-react";
 import { motion } from "framer-motion";
+import { useSession } from "next-auth/react";
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
+  const { data: session, status } = useSession();
   const { t, lang } = useLanguage();
   const isRTL = lang === "ar";
   
@@ -48,6 +50,12 @@ export default function ProductDetailsPage() {
 
   const handleAddToCart = () => {
     if (!product) return;
+
+    if (status === "unauthenticated") {
+      setError(isRTL ? "يجب تسجيل الدخول أولاً لإضافة منتجات للسلة" : "Please sign in to add items to your cart");
+      setTimeout(() => setError(null), 3000);
+      return;
+    }
     
     // Check required variants
     if (product.sizes?.length > 0 && !selectedSize) {
@@ -260,7 +268,7 @@ export default function ProductDetailsPage() {
             </div>
           )}
           <div className={`flex flex-col sm:flex-row gap-4 pt-8 ${!error ? 'mt-auto' : ''}`}>
-            <div className="flex items-center justify-between border-2 border-neutral-200 rounded-full h-14 px-6 sm:w-1/3">
+            <div className="flex items-center justify-between border-2 border-neutral-200 rounded-full h-14 min-h-[56px] shrink-0 px-6 sm:w-1/3">
               <button 
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 className="text-neutral-400 hover:text-black transition-colors"
@@ -281,7 +289,7 @@ export default function ProductDetailsPage() {
             <button
               onClick={handleAddToCart}
               disabled={isAdding || isOutOfStock}
-              className={`flex-1 h-14 rounded-full font-black text-sm uppercase tracking-widest flex items-center justify-center transition-all ${
+              className={`w-full sm:flex-1 h-14 min-h-[56px] shrink-0 rounded-full font-black text-sm uppercase tracking-widest flex items-center justify-center transition-all ${
                 isOutOfStock
                   ? "bg-neutral-200 text-neutral-400 cursor-not-allowed"
                   : "bg-black text-white hover:bg-neutral-800 active:scale-[0.98] shadow-2xl shadow-black/20"

@@ -111,7 +111,6 @@ export default function ProductsPage() {
         {/* Subcategories (Visible if active category has children) */}
         {subCategories.length > 0 && (
           <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-1">
-             <div className="text-[10px] sm:text-xs font-black uppercase tracking-widest text-neutral-400 mr-2 shrink-0">{t("products.refine") || (isRTL ? "تصفية: " : "Refine: ")}</div>
              {subCategories.map(sub => (
                 <Link
                   key={sub._id}

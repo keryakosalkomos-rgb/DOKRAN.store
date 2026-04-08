@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, ShoppingCart, Package, Tags, Users, Settings, Globe, MessageCircle } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, Package, Tags, Users, Settings, Globe, MessageCircle, LogOut } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { signOut } from "next-auth/react";
 import Logo from "@/components/ui/Logo";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -92,6 +93,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
            >
              <Globe className="w-5 h-5 shrink-0" />
              {lang === "en" ? "العربية" : "English"}
+           </button>
+           <button 
+             onClick={() => signOut({ callbackUrl: "/" })}
+             className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm text-red-500 hover:bg-red-500/10"
+           >
+             <LogOut className="w-5 h-5 shrink-0" />
+             {t("nav.signOut") || "Sign Out"}
            </button>
            <button 
              onClick={() => setIsSidebarOpen(false)}

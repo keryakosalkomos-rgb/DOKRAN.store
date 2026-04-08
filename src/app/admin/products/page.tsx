@@ -27,8 +27,9 @@ export default function AdminProductsPage() {
   const [stock, setStock] = useState("0");
   const [mainCategoryId, setMainCategoryId] = useState("");
   const [subCategoryId, setSubCategoryId] = useState("");
-  const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [selectedSizes, setSelectedSizes] = useState<any[]>([]);
   const [sizeInput, setSizeInput] = useState("");
+  const [sizeQuantity, setSizeQuantity] = useState("0");
   const [colorInput, setColorInput] = useState("#000000");
   const [colors, setColors] = useState<string[]>([]);
   const [images, setImages] = useState<string[]>([]);
@@ -50,15 +51,19 @@ export default function AdminProductsPage() {
 
   const addSize = () => {
     const s = sizeInput.trim().toUpperCase();
-    if (s && !selectedSizes.includes(s)) setSelectedSizes(prev => [...prev, s]);
+    const q = parseInt(sizeQuantity) || 0;
+    if (s && !selectedSizes.find(x => (typeof x === 'string' ? x : x.size) === s)) {
+      setSelectedSizes(prev => [...prev, { size: s, quantity: q }]);
+    }
     setSizeInput("");
+    setSizeQuantity("0");
   };
 
   const addColor = () => { if (!colors.includes(colorInput)) setColors([...colors, colorInput]); };
 
   const resetForm = () => {
     setName(""); setDescription(""); setPrice(""); setStock("0"); setMainCategoryId(""); setSubCategoryId("");
-    setSelectedSizes([]); setColors([]); setImages([]); setIsFeatured(false);
+    setSelectedSizes([]); setSizeInput(""); setSizeQuantity("0"); setColors([]); setImages([]); setIsFeatured(false);
     setColorInput("#000000"); setError(""); setEditingId(null);
   };
 
@@ -171,17 +176,25 @@ export default function AdminProductsPage() {
                     onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addSize(); }}}
                     className="flex-1 border border-neutral-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-black text-sm"
                     placeholder={t("admin.typeSize")} />
+                  <input type="number" min="0" value={sizeQuantity} onChange={e => setSizeQuantity(e.target.value)}
+                    onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addSize(); }}}
+                    className="w-24 border border-neutral-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-black text-sm"
+                    placeholder="Qty" title="Quantity" />
                   <button type="button" onClick={addSize}
                     className="px-4 py-2 bg-neutral-900 text-white rounded-lg text-sm font-medium hover:bg-neutral-700">{t("admin.addBtn")}</button>
                 </div>
                 <div className="flex gap-2 flex-wrap">
-                  {selectedSizes.map(s => (
-                    <span key={s} className="flex items-center gap-1 bg-black text-white px-3 py-1.5 rounded-lg text-sm font-semibold">
-                      {s}
-                      <button type="button" onClick={() => setSelectedSizes(prev => prev.filter(x => x !== s))}
-                        className="ml-1 opacity-70 hover:opacity-100">×</button>
-                    </span>
-                  ))}
+                  {selectedSizes.map(s => {
+                    const sizeName = typeof s === 'string' ? s : s.size;
+                    const sizeQty = typeof s === 'object' ? s.quantity : null;
+                    return (
+                      <span key={sizeName} className="flex items-center gap-1 bg-black text-white px-3 py-1.5 rounded-lg text-sm font-semibold">
+                        {sizeName} {sizeQty !== null && <span className="bg-white/20 px-1.5 py-0.5 rounded text-xs ml-1">Qty: {sizeQty}</span>}
+                        <button type="button" onClick={() => setSelectedSizes(prev => prev.filter(x => (typeof x === 'string' ? x : x.size) !== sizeName))}
+                          className="ml-1 opacity-70 hover:opacity-100">×</button>
+                      </span>
+                    )
+                  })}
                 </div>
               </div>
 

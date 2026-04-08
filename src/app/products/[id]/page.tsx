@@ -22,6 +22,7 @@ export default function ProductDetailsPage() {
   const [quantity, setQuantity] = useState(1);
   const [isAdding, setIsAdding] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const addItem = useCartStore((state) => state.addItem);
 
@@ -50,13 +51,16 @@ export default function ProductDetailsPage() {
     
     // Check required variants
     if (product.sizes?.length > 0 && !selectedSize) {
-      alert(t("products.selectSize"));
+      setError(t("products.selectSize") || "Please select a size first");
+      setTimeout(() => setError(null), 3000);
       return;
     }
     if (product.colors?.length > 0 && !selectedColor) {
-      alert(t("products.selectColor"));
+      setError(t("products.selectColor") || "Please select a color first");
+      setTimeout(() => setError(null), 3000);
       return;
     }
+    setError(null);
 
     setIsAdding(true);
     addItem({
@@ -189,18 +193,21 @@ export default function ProductDetailsPage() {
                   <button
                     key={color}
                     onClick={() => setSelectedColor(color)}
-                    className={`h-12 px-6 rounded-2xl border-2 font-bold text-sm transition-all flex items-center gap-2 ${
+                    className={`h-12 rounded-2xl border-2 font-bold text-sm transition-all flex items-center justify-center ${
+                      color.startsWith("#") ? "w-12 px-0 py-0" : "px-6 gap-2"
+                    } ${
                       selectedColor === color 
                         ? "border-black bg-black text-white" 
                         : "border-neutral-200 bg-white text-neutral-800 hover:border-black"
                     }`}
+                    title={color}
                   >
                     {/* If color looks like hex or simple color word, show a dot */}
                     <span 
-                      className="w-4 h-4 rounded-full border border-white/20" 
+                      className={`rounded-full border border-neutral-300 shadow-inner ${color.startsWith("#") ? "w-6 h-6" : "w-4 h-4"}`} 
                       style={{ backgroundColor: color.startsWith("#") ? color : color.toLowerCase() }}
                     ></span>
-                    {color}
+                    {!color.startsWith("#") && <span>{color}</span>}
                   </button>
                 ))}
               </div>
@@ -214,25 +221,45 @@ export default function ProductDetailsPage() {
                 <span className="text-sm font-bold uppercase tracking-widest">{t("products.selectSize")}</span>
               </div>
               <div className="flex flex-wrap gap-3">
-                {product.sizes.map((size: string) => (
+                {product.sizes.map((sObj: any) => {
+                  const size = typeof sObj === 'string' ? sObj : sObj.size;
+                  const qty = typeof sObj === 'object' ? sObj.quantity : null;
+                  const isSizeOutOfStock = qty !== null && qty <= 0;
+                  return (
                   <button
                     key={size}
                     onClick={() => setSelectedSize(size)}
-                    className={`h-12 px-6 rounded-2xl border-2 font-black uppercase text-sm transition-all ${
+                    disabled={isSizeOutOfStock}
+                    className={`h-auto min-h-[3rem] py-2 px-4 rounded-xl border-2 uppercase text-sm transition-all flex flex-col items-center justify-center gap-1 ${
+                      isSizeOutOfStock ? "opacity-70 cursor-not-allowed border-neutral-200 bg-neutral-50" :
                       selectedSize === size 
                         ? "border-black bg-black text-white" 
                         : "border-neutral-200 bg-white text-neutral-800 hover:border-black"
                     }`}
                   >
-                    {size}
+                    <span className={`font-black ${isSizeOutOfStock ? "line-through text-neutral-400" : ""}`}>{size}</span>
+                    {isSizeOutOfStock ? (
+                      <span className="text-[10px] font-bold text-red-500 lowercase tracking-wide">out of stock</span>
+                    ) : qty !== null && qty > 0 ? (
+                      <span className={`text-[10px] font-bold lowercase tracking-wide ${selectedSize === size ? "text-white/80" : "text-emerald-600"}`}>
+                        {qty} {t("products.left") || "left"}
+                      </span>
+                    ) : null}
                   </button>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
 
           {/* Quantity & Add to Cart */}
-          <div className="flex flex-col sm:flex-row gap-4 mt-auto pt-8">
+          {error && (
+            <div className="bg-red-50 text-red-600 text-sm font-bold px-4 py-3 rounded-xl mt-auto border border-red-100 flex items-center gap-2 animate-in fade-in">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+              {error}
+            </div>
+          )}
+          <div className={`flex flex-col sm:flex-row gap-4 pt-8 ${!error ? 'mt-auto' : ''}`}>
             <div className="flex items-center justify-between border-2 border-neutral-200 rounded-full h-14 px-6 sm:w-1/3">
               <button 
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}

@@ -44,16 +44,29 @@ export async function POST(req: Request) {
 
     // Update Product Stock
     try {
-      const batch = db.batch();
       for (const item of orderItems) {
         if (item.product) {
           const productRef = db.collection("products").doc(item.product);
-          batch.update(productRef, {
-            stock: FieldValue.increment(-item.quantity)
+          await db.runTransaction(async (transaction) => {
+            const pDoc = await transaction.get(productRef);
+            if (pDoc.exists) {
+              const pData = pDoc.data();
+              let updateObj: any = { stock: FieldValue.increment(-item.quantity) };
+              if (item.size && pData?.sizes) {
+                const newSizes = pData.sizes.map((sCol: any) => {
+                  const sName = typeof sCol === 'string' ? sCol : sCol.size;
+                  if (sName === item.size && typeof sCol === 'object' && sCol.quantity !== undefined && sCol.quantity !== null) {
+                    return { ...sCol, quantity: sCol.quantity - item.quantity };
+                  }
+                  return sCol;
+                });
+                updateObj.sizes = newSizes;
+              }
+              transaction.update(productRef, updateObj);
+            }
           });
         }
       }
-      await batch.commit();
     } catch (err) {
       console.error("Failed to decrement stock:", err);
     }

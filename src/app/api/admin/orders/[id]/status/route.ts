@@ -35,36 +35,64 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
       const previousStatus = docSnap.data()?.status;
       const orderItems = docSnap.data()?.orderItems || [];
 
-      // If order is newly cancelled, restore stock
-      if (status === "Cancelled" && previousStatus !== "Cancelled") {
+      // If order is newly cancelled, restore stock and fully delete it
+      if (status === "Cancelled") {
         try {
-          const batch = db.batch();
           for (const item of orderItems) {
             if (item.product) {
               const productRef = db.collection("products").doc(item.product);
-              batch.update(productRef, { stock: FieldValue.increment(item.quantity) });
+              
+              await db.runTransaction(async (transaction) => {
+                const pDoc = await transaction.get(productRef);
+                if (pDoc.exists) {
+                  const pData = pDoc.data();
+                  let updateObj: any = { stock: FieldValue.increment(item.quantity) };
+                  
+                  // Restore specific size quantity if applicable
+                  if (item.size && pData?.sizes) {
+                    const newSizes = pData.sizes.map((sCol: any) => {
+                       const sName = typeof sCol === 'string' ? sCol : sCol.size;
+                       if (sName === item.size && typeof sCol === 'object' && sCol.quantity !== undefined && sCol.quantity !== null) {
+                         return { ...sCol, quantity: sCol.quantity + item.quantity };
+                       }
+                       return sCol;
+                    });
+                    updateObj.sizes = newSizes;
+                  }
+                  
+                  transaction.update(productRef, updateObj);
+                }
+              });
             }
           }
-          await batch.commit();
         } catch (e) {
           console.error("Failed to restore stock on cancel:", e);
         }
-      }
 
-      // If order is uncancelled, deduct stock again
-      if (status !== "Cancelled" && previousStatus === "Cancelled") {
-        try {
-          const batch = db.batch();
-          for (const item of orderItems) {
-            if (item.product) {
-              const productRef = db.collection("products").doc(item.product);
-              batch.update(productRef, { stock: FieldValue.increment(-item.quantity) });
-            }
-          }
-          await batch.commit();
-        } catch (e) {
-          console.error("Failed to deduct stock on uncancel:", e);
+        // Fully delete the order document
+        await docRef.delete();
+        
+        // Notify user about cancellation/deletion
+        const userId = docSnap.data()?.user;
+        if (userId) {
+          sendNotificationToUser(userId, {
+            title: "Order Cancelled",
+            body: `Your order #${id.slice(-8).toUpperCase()} has been cancelled.`,
+            data: { url: "/profile" }
+          });
+          try {
+            await db.collection("notifications").add({
+              targetUser: userId,
+              title: "Order Cancelled",
+              body: `Your order #${id.slice(-8).toUpperCase()} has been cancelled.`,
+              url: "/profile",
+              isRead: false,
+              createdAt: new Date().toISOString()
+            });
+          } catch (err) {}
         }
+        
+        return NextResponse.json({ success: true, message: "Order completely deleted" });
       }
 
       updateData.status = status;

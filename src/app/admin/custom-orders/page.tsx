@@ -80,12 +80,7 @@ export default function AdminCustomOrdersPage() {
         body: JSON.stringify({ status: newStatus }),
       });
       if (res.ok) {
-        if (newStatus === "Rejected") {
-          setOrders(prev => prev.filter(o => o._id !== orderId));
-          if (selectedOrder?._id === orderId) setSelectedOrder(null);
-        } else {
-          setOrders(prev => prev.map(o => o._id === orderId ? { ...o, status: newStatus } : o));
-        }
+        setOrders(prev => prev.map(o => o._id === orderId ? { ...o, status: newStatus } : o));
       }
     } catch (e) {
       console.error("Failed to update status", e);

@@ -62,7 +62,7 @@ export default function FloatingChat() {
             initial={{ opacity: 0, y: 20, scale: 0.95, transformOrigin: isRTL ? "bottom left" : "bottom right" }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="mb-4 w-[calc(100vw-2rem)] sm:w-[400px] h-[calc(100dvh-100px)] sm:h-[500px] max-h-[700px] flex flex-col"
+            className="mb-4 w-[calc(100vw-2rem)] sm:w-[400px] h-[calc(100dvh-100px)] sm:h-[500px] max-h-[calc(100vh-120px)] flex flex-col"
           >
             <ChatBox 
               conversationId={(session.user as any).id} 

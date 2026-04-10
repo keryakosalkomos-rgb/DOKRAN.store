@@ -160,7 +160,7 @@ export default function ChatBox({ conversationId, viewerRole, title, onClose }: 
             value={text}
             onChange={(e) => setText(e.target.value)}
             placeholder={t("chat.placeholder")}
-            className="w-full bg-neutral-100 rounded-xl pl-4 pr-12 py-3 text-sm outline-none focus:ring-2 focus:ring-black transition-all"
+            className={`w-full bg-neutral-100 rounded-xl py-3 text-sm outline-none focus:ring-2 focus:ring-black transition-all ${isRTL ? "pr-4 pl-12" : "pl-4 pr-12"}`}
             disabled={sending}
           />
           <button

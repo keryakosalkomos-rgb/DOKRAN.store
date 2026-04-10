@@ -69,10 +69,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
           console.error("Failed to restore stock on cancel:", e);
         }
 
-        // Fully delete the order document
-        await docRef.delete();
-        
-        // Notify user about cancellation/deletion
+        // Notify user about cancellation
         const userId = docSnap.data()?.user;
         if (userId) {
           sendNotificationToUser(userId, {
@@ -91,15 +88,21 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
             });
           } catch (err) {}
         }
-        
-        return NextResponse.json({ success: true, message: "Order completely deleted" });
       }
 
       updateData.status = status;
     }
 
     if (shippingPrice !== undefined) {
-      const itemsPrice = docSnap.data()?.itemsPrice || docSnap.data()?.totalPrice || 0;
+      const currentData = docSnap.data() || {};
+      const oldShipping = currentData.shippingPrice || 0;
+      let itemsPrice = currentData.itemsPrice;
+      
+      if (itemsPrice === undefined) {
+        itemsPrice = (currentData.totalPrice || 0) - oldShipping;
+        updateData.itemsPrice = itemsPrice;
+      }
+
       updateData.shippingPrice = Number(shippingPrice);
       updateData.totalPrice = itemsPrice + Number(shippingPrice);
     }

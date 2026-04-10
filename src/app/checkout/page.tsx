@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useCartStore } from "@/store/useCartStore";
 import { CheckCircle2, Loader2, Upload, ImageIcon, CheckCircle, Info } from "lucide-react";
 import Link from "next/link";
@@ -11,6 +12,7 @@ export default function CheckoutPage() {
   const { t } = useLanguage();
   const router = useRouter();
   const { items, cartTotal, clearCart } = useCartStore();
+  const { data: session } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [loadingSettings, setLoadingSettings] = useState(true);
@@ -21,7 +23,31 @@ export default function CheckoutPage() {
     instaPayNumber: "",
     mobileWalletNumber: "",
     bankAccountDetails: "",
+    fixedShippingPrice: 0,
   });
+
+  useEffect(() => {
+    if (session) {
+      fetch("/api/user/profile")
+        .then(res => {
+          if (!res.ok) throw new Error("Profile not found");
+          return res.json();
+        })
+        .then(data => {
+          if (data.user) {
+            setFormData(prev => ({
+              ...prev,
+              fullName: data.user.name || prev.fullName,
+              phone: data.user.phone || prev.phone,
+              address: data.user.address || prev.address,
+              city: data.user.city || prev.city,
+              country: data.user.country || prev.country
+            }));
+          }
+        })
+        .catch(console.error);
+    }
+  }, [session]);
 
   useEffect(() => {
     fetch("/api/admin/settings")
@@ -32,6 +58,7 @@ export default function CheckoutPage() {
             instaPayNumber: data.instaPayNumber || "",
             mobileWalletNumber: data.mobileWalletNumber || "",
             bankAccountDetails: data.bankAccountDetails || "",
+            fixedShippingPrice: Number(data.fixedShippingPrice) || 0,
           });
         }
       })
@@ -69,7 +96,6 @@ export default function CheckoutPage() {
     phone: "",
     address: "",
     city: "",
-    postalCode: "",
     country: "",
     notes: "",
     paymentMethod: "Cash on Delivery",
@@ -98,13 +124,15 @@ export default function CheckoutPage() {
         phone: formData.phone,
         address: formData.address,
         city: formData.city,
-        postalCode: formData.postalCode,
         country: formData.country,
       };
 
       // 1. Process Standard Order
       if (standardItems.length > 0) {
         const itemsPrice = standardItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+        const shippingPrice = platformSettings.fixedShippingPrice;
+        const finalTotal = itemsPrice + shippingPrice;
+
         const res = await fetch("/api/orders", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -113,8 +141,8 @@ export default function CheckoutPage() {
             shippingAddress,
             paymentMethod: formData.paymentMethod,
             itemsPrice,
-            shippingPrice: 0,
-            totalPrice: itemsPrice, // Initial total without shipping
+            shippingPrice,
+            totalPrice: finalTotal,
             notes: formData.notes,
             paymentProof,
           }),
@@ -202,14 +230,10 @@ export default function CheckoutPage() {
               <input required type="text" name="address" value={formData.address} onChange={handleChange} className="w-full border rounded-md px-4 py-2 outline-none focus:ring-2 focus:ring-black" />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                <div>
                 <label className="block text-sm font-medium mb-1">{t("custom.city")}</label>
                 <input required type="text" name="city" value={formData.city} onChange={handleChange} className="w-full border rounded-md px-4 py-2 outline-none focus:ring-2 focus:ring-black" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">{t("custom.postalCode")}</label>
-                <input required type="text" name="postalCode" value={formData.postalCode} onChange={handleChange} className="w-full border rounded-md px-4 py-2 outline-none focus:ring-2 focus:ring-black" />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">{t("custom.country")}</label>
@@ -328,15 +352,17 @@ export default function CheckoutPage() {
                 <span className="text-neutral-600">{t("cart.subtotal")}</span>
                 <span>{cartTotal()} {t("common.currency")}</span>
               </div>
-              <div className="flex flex-col gap-1 items-end">
-                <span className="text-indigo-600 font-bold">{t("checkout.shippingTBD")}</span>
-                <span className="text-[10px] text-neutral-400">{t("checkout.shippingNote")}</span>
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-neutral-600">Shipping</span>
+                <span className="font-bold text-indigo-600">
+                  {platformSettings.fixedShippingPrice > 0 ? `+${platformSettings.fixedShippingPrice} ${t("common.currency")}` : "Free"}
+                </span>
               </div>
             </div>
 
             <div className="flex justify-between text-xl font-extrabold border-t pt-4 mb-8">
               <span>{t("cart.total")}</span>
-              <span>{cartTotal()} {t("common.currency")}</span>
+              <span>{(cartTotal() + platformSettings.fixedShippingPrice)} {t("common.currency")}</span>
             </div>
 
             <button

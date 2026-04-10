@@ -34,7 +34,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {!isSidebarOpen && (
         <button 
           onClick={() => setIsSidebarOpen(true)}
-          className="lg:hidden fixed bottom-6 left-6 z-[100] w-14 h-14 bg-black text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all"
+          className={`lg:hidden fixed bottom-6 ${isRTL ? "right-6" : "left-6"} z-[100] w-14 h-14 bg-black text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all`}
         >
           <LayoutDashboard className="w-6 h-6" />
         </button>

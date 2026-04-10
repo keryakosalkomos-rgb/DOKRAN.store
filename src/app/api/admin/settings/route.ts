@@ -23,6 +23,7 @@ export async function GET() {
         isActive: true,
         adminWhatsAppNumber: "",
         whatsAppNotificationsEnabled: false,
+        fixedShippingPrice: 0,
         heroImage: "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&q=80&w=2000",
         homeCollections: [
           { id: "1", title: "Men", image: "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&q=80&w=800", link: "/products?category=men" },

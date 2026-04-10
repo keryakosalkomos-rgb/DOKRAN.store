@@ -18,6 +18,7 @@ export default function AdminSettingsPage() {
     isActive: true,
     adminWhatsAppNumber: "",
     whatsAppNotificationsEnabled: false,
+    fixedShippingPrice: 0,
   });
 
   useEffect(() => {
@@ -32,6 +33,7 @@ export default function AdminSettingsPage() {
             isActive: data.isActive !== false,
             adminWhatsAppNumber: data.adminWhatsAppNumber || "",
             whatsAppNotificationsEnabled: !!data.whatsAppNotificationsEnabled,
+            fixedShippingPrice: data.fixedShippingPrice || 0,
           });
         }
         setLoading(false);
@@ -211,6 +213,13 @@ export default function AdminSettingsPage() {
                <input type="checkbox" name="isActive" checked={settings.isActive} onChange={handleChange} className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" />
                <span className="text-sm font-medium">{t("admin.acceptManual")}</span>
             </label>
+          </div>
+          <div className="pt-4 border-t border-neutral-100">
+            <label className="block text-sm font-medium mb-2">{t("admin.fixedShippingPrice") || "Fixed Shipping Price"}</label>
+            <div className="relative max-w-xs">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-[10px] font-black">{t("common.currency")}</span>
+              <input type="number" name="fixedShippingPrice" value={settings.fixedShippingPrice} onChange={handleChange} className="w-full border rounded-lg pl-12 pr-4 py-2 bg-neutral-50" placeholder="0" min="0" />
+            </div>
           </div>
 
           <div className="flex items-center gap-4">

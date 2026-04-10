@@ -72,6 +72,8 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
       const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
       if (isIos) {
         setShowIOSInstructions(true);
+      } else {
+        alert("لتنزيل التطبيق، اضغط على أيقونة التثبيت (Install) في شريط عنوان المتصفح الخاص بك، أو من قائمة خيارات المتصفح (Add to Home Screen).");
       }
     }
   };

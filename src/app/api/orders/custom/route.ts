@@ -23,6 +23,22 @@ export async function POST(req: Request) {
     };
 
     const docRef = await db.collection("customOrders").add(newOrder);
+    
+    // Update user profile with shipping address
+    if (data.shippingAddress) {
+      try {
+        const userRef = db.collection("users").doc((session.user as any).id);
+        await userRef.update({
+          address: data.shippingAddress.address,
+          city: data.shippingAddress.city,
+          country: data.shippingAddress.country,
+          phone: data.shippingAddress.phone || (session.user as any).phone
+        });
+      } catch(err) {
+        console.error("Failed to update user address:", err);
+      }
+    }
+
     return NextResponse.json({ _id: docRef.id, ...newOrder }, { status: 201 });
   } catch (error: any) {
     console.error("Custom Order creation error:", error);

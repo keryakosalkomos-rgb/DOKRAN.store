@@ -52,8 +52,7 @@ export default function ProductDetailsPage() {
     if (!product) return;
 
     if (status === "unauthenticated") {
-      setError(isRTL ? "يجب تسجيل الدخول أولاً لإضافة منتجات للسلة" : "Please sign in to add items to your cart");
-      setTimeout(() => setError(null), 3000);
+      router.push("/login?callbackUrl=" + encodeURIComponent(window.location.href));
       return;
     }
     

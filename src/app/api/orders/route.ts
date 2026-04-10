@@ -22,14 +22,21 @@ export async function POST(req: Request) {
     }
 
     const db = adminDb();
+    const settingsSnap = await db.collection("settings").doc("payment").get();
+    const fixedShippingPrice = settingsSnap.exists ? (Number(settingsSnap.data()?.fixedShippingPrice) || 0) : 0;
+
+    const actualItemsPrice = orderItems.reduce((acc: any, it: any) => acc + (it.price * it.quantity), 0);
+    const finalShippingPrice = shippingPrice !== undefined && shippingPrice !== 0 ? shippingPrice : fixedShippingPrice;
+    const actualTotalPrice = actualItemsPrice + finalShippingPrice;
+
     const newOrder = {
       user: (session.user as any).id,
       orderItems,
       shippingAddress,
       paymentMethod,
-      itemsPrice: itemsPrice || totalPrice,
-      shippingPrice: shippingPrice || 0,
-      totalPrice: totalPrice,
+      itemsPrice: actualItemsPrice,
+      shippingPrice: finalShippingPrice,
+      totalPrice: actualTotalPrice,
       notes: notes || "",
       paymentProof: paymentProof || "",
       isPaid: false,
@@ -41,6 +48,19 @@ export async function POST(req: Request) {
 
     const docRef = await db.collection("orders").add(newOrder);
     const createdOrder = { _id: docRef.id, ...newOrder };
+
+    // Update user profile with shipping address
+    try {
+      const userRef = db.collection("users").doc((session.user as any).id);
+      await userRef.update({
+        address: shippingAddress.address,
+        city: shippingAddress.city,
+        country: shippingAddress.country,
+        phone: shippingAddress.phone || (session.user as any).phone
+      });
+    } catch(err) {
+      console.error("Failed to update user address:", err);
+    }
 
     // Update Product Stock
     try {

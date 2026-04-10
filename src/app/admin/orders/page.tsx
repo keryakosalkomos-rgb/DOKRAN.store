@@ -60,11 +60,7 @@ export default function AdminOrdersPage() {
         body: JSON.stringify({ status: newStatus }),
       });
       if (res.ok) {
-        if (newStatus === "Cancelled") {
-          setOrders(prev => prev.filter(o => o._id !== orderId));
-        } else {
-          setOrders(prev => prev.map(o => o._id === orderId ? { ...o, status: newStatus } : o));
-        }
+        setOrders(prev => prev.map(o => o._id === orderId ? { ...o, status: newStatus } : o));
       }
     } catch (e) {
       console.error("Failed to update status", e);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { Upload, X, Loader2, Send, MessageCircle, CheckCircle, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -22,12 +22,35 @@ export default function CustomDesignPage() {
   
   // Shipping modal state
   const [showShipping, setShowShipping] = useState(false);
-  const [shipping, setShipping] = useState({ fullName: "", address: "", city: "", postalCode: "", country: "", phone: "" });
+  const [shipping, setShipping] = useState({ fullName: "", address: "", city: "", country: "", phone: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
   
   // Post-submit chat state
   const [submittedOrderId, setSubmittedOrderId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (session) {
+      fetch("/api/user/profile")
+        .then(res => {
+          if (!res.ok) throw new Error("Profile not found");
+          return res.json();
+        })
+        .then(data => {
+          if (data.user) {
+            setShipping(prev => ({
+              ...prev,
+              fullName: data.user.name || prev.fullName,
+              phone: data.user.phone || prev.phone,
+              address: data.user.address || prev.address,
+              city: data.user.city || prev.city,
+              country: data.user.country || prev.country
+            }));
+          }
+        })
+        .catch(console.error);
+    }
+  }, [session]);
 
   const logoRef = useRef<HTMLInputElement>(null);
   const designRef = useRef<HTMLInputElement>(null);
@@ -268,7 +291,6 @@ export default function CustomDesignPage() {
                     { key: "phone", label: t("custom.phone"), col2: false },
                     { key: "address", label: t("custom.address"), col2: true },
                     { key: "city", label: t("custom.city"), col2: false },
-                    { key: "postalCode", label: t("custom.postalCode"), col2: false },
                     { key: "country", label: t("custom.country"), col2: false },
                   ].map(({ key, label, col2 }) => (
                     <div key={key} className={col2 ? "sm:col-span-2" : ""}>

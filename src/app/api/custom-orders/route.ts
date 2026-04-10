@@ -40,6 +40,21 @@ export async function POST(request: Request) {
     const docRef = await db.collection("customOrders").add(newOrder);
     const order = { _id: docRef.id, ...newOrder };
 
+    // Update user profile with shipping address
+    if (shippingAddress) {
+      try {
+        const userRef = db.collection("users").doc(userId);
+        await userRef.update({
+          address: shippingAddress.address,
+          city: shippingAddress.city,
+          country: shippingAddress.country,
+          phone: shippingAddress.phone || (session.user as any).phone
+        });
+      } catch(err) {
+        console.error("Failed to update user address:", err);
+      }
+    }
+
     // Send push notification to admins
     try {
       await sendNotificationToAdmins({

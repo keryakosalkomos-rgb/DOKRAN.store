@@ -41,40 +41,38 @@ export async function POST(req: NextRequest) {
     console.log(resetUrl);
     console.log("=========================================");
 
-    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+    if (process.env.BREVO_API_KEY) {
       try {
-        // Prepare Nodemailer
-        const transporter = nodemailer.createTransport({
-          host: 'smtp.gmail.com',
-          port: 587,
-          secure: false, // Use STARTTLS
-          auth: {
-            user: process.env.EMAIL_USER || '',
-            pass: process.env.EMAIL_PASS || '',
+        const brevoRes = await fetch("https://api.brevo.com/v3/smtp/email", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "api-key": process.env.BREVO_API_KEY,
           },
-          connectionTimeout: 10000, // 10 seconds timeout
-        });
-
-        // Send email
-        await transporter.sendMail({
-          from: `"DOKRAN" <${process.env.EMAIL_USER}>`,
-          to: email,
-          subject: "Password Reset Request",
-          html: `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-              <h1 style="font-size: 24px; font-weight: 800; text-align: center;">Password Reset Request</h1>
-              <p style="color: #666; line-height: 1.6;">You requested to reset your password for your DOKRAN account. Click the button below to set a new password. This link is only valid for 1 hour.</p>
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${resetUrl}" style="background-color: #000; color: #fff; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Reset Password</a>
+          body: JSON.stringify({
+            sender: { name: "DOKRAN Fashion", email: process.env.BREVO_SENDER_EMAIL || "kerooegypt2030@gmail.com" },
+            to: [{ email }],
+            subject: "Password Reset Request",
+            htmlContent: `
+              <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                <h1 style="font-size: 24px; font-weight: 800; text-align: center; color: #000;">Password Reset Request</h1>
+                <p style="color: #666; line-height: 1.6; text-align: center;">You requested to reset your password for your DOKRAN account. Click the button below to set a new password. This link is only valid for 1 hour.</p>
+                <div style="text-align: center; margin: 30px 0;">
+                  <a href="${resetUrl}" style="background-color: #000; color: #fff; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Reset Password</a>
+                </div>
+                <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
+                <p style="color: #999; font-size: 12px; text-align: center;">If you didn't request this, you can safely ignore this email.</p>
               </div>
-              <p style="color: #999; font-size: 12px; text-align: center;">If you didn't request this, you can safely ignore this email.</p>
-            </div>
-          `,
+            `,
+          }),
         });
+        
+        const brevoData = await brevoRes.json();
+        if (!brevoRes.ok) {
+           console.error("Brevo API error:", brevoData);
+        }
       } catch (emailError) {
-        console.error("Failed to send email:", emailError);
-        // We still return 200/success message to the client to avoid enumeration/leaking info,
-        // but we'll have a record of the failure in the logs.
+        console.error("Failed to send email via Brevo:", emailError);
       }
     }
 

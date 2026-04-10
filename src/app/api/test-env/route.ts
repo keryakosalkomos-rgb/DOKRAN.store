@@ -1,41 +1,48 @@
 import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
 
 export async function GET() {
-  const emailUser = process.env.EMAIL_USER || "";
-  const emailPass = process.env.EMAIL_PASS || "";
+  const brevoApiKey = process.env.BREVO_API_KEY || "";
+  const senderEmail = process.env.BREVO_SENDER_EMAIL || "kerooegypt2030@gmail.com";
+  const emailToTest = "kerooegypt2030@gmail.com";
 
   let sendResult = "Not attempted";
   let errorDetail = null;
 
-  try {
-    const transporter = nodemailer.createTransport({
-      host: 'smtp.gmail.com',
-      port: 587,
-      secure: false,
-      auth: {
-        user: emailUser,
-        pass: emailPass,
-      },
-      connectionTimeout: 15000,
-    });
+  if (brevoApiKey) {
+    try {
+      const res = await fetch("https://api.brevo.com/v3/smtp/email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "api-key": brevoApiKey,
+        },
+        body: JSON.stringify({
+          sender: { name: "DOKRAN Test", email: senderEmail },
+          to: [{ email: emailToTest }],
+          subject: "DOKRAN BREVO TEST",
+          textContent: "This is a test email via Brevo API.",
+        }),
+      });
 
-    await transporter.sendMail({
-      from: `"DOKRAN Test" <${emailUser}>`,
-      to: emailUser, // Send to yourself
-      subject: "DOKRAN SMTP TEST",
-      text: "This is a test email to verify your SMTP settings.",
-    });
-    sendResult = "Success! Email sent.";
-  } catch (err: any) {
-    sendResult = "Failed";
-    errorDetail = err.message || JSON.stringify(err);
+      const data = await res.json();
+      if (res.ok) {
+        sendResult = "Success! Brevo API sent the email.";
+      } else {
+        sendResult = "Failed via Brevo API";
+        errorDetail = data;
+      }
+    } catch (err: any) {
+      sendResult = "Network Error";
+      errorDetail = err.message;
+    }
+  } else {
+    sendResult = "BREVO_API_KEY is missing";
   }
 
   return NextResponse.json({
-    hasEmailUser: !!emailUser,
-    hasEmailPass: !!emailPass,
-    emailUser: emailUser ? `${emailUser.slice(0, 3)}...` : "Missing",
+    hasBrevoKey: !!brevoApiKey,
+    brevoKeyPreview: brevoApiKey ? `${brevoApiKey.slice(0, 8)}...` : "Missing",
+    senderEmail,
     nextAuthUrl: process.env.NEXTAUTH_URL || "Not Set",
     sendResult,
     errorDetail

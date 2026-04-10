@@ -47,6 +47,16 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
 
+    // 3. Register Service Worker
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/sw.js")
+          .then((reg) => console.log("SW: registered", reg))
+          .catch((err) => console.log("SW: failed", err));
+      });
+    }
+
     // If it's iOS and not installed, we can suggest manual install
     if (isIos() && !isInStandaloneMode()) {
        // We don't show it immediately, but mark as installable for the UI
@@ -68,12 +78,10 @@ export function PWAProvider({ children }: { children: React.ReactNode }) {
         setIsInstalled(true);
       }
     } else {
-      // Logic for iOS or fallback
+      // Logic for iOS
       const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
       if (isIos) {
         setShowIOSInstructions(true);
-      } else {
-        alert("لتنزيل التطبيق، اضغط على أيقونة التثبيت (Install) في شريط عنوان المتصفح الخاص بك، أو من قائمة خيارات المتصفح (Add to Home Screen).");
       }
     }
   };

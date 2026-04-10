@@ -45,12 +45,14 @@ export async function POST(req: NextRequest) {
       try {
         // Prepare Nodemailer
         const transporter = nodemailer.createTransport({
-          service: 'gmail', // Standard gmail auth
+          host: 'smtp.gmail.com',
+          port: 587,
+          secure: false, // Use STARTTLS
           auth: {
             user: process.env.EMAIL_USER || '',
             pass: process.env.EMAIL_PASS || '',
           },
-          connectionTimeout: 5000, // 5 seconds timeout
+          connectionTimeout: 10000, // 10 seconds timeout
         });
 
         // Send email

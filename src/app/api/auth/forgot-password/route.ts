@@ -42,29 +42,38 @@ export async function POST(req: NextRequest) {
     console.log("=========================================");
 
     if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
-      // Prepare Nodemailer
-      const transporter = nodemailer.createTransport({
-        service: 'gmail', // Standard gmail auth
-        auth: {
-          user: process.env.EMAIL_USER || '',
-          pass: process.env.EMAIL_PASS || '',
-        },
-      });
+      try {
+        // Prepare Nodemailer
+        const transporter = nodemailer.createTransport({
+          service: 'gmail', // Standard gmail auth
+          auth: {
+            user: process.env.EMAIL_USER || '',
+            pass: process.env.EMAIL_PASS || '',
+          },
+          connectionTimeout: 5000, // 5 seconds timeout
+        });
 
-      // Send email
-      await transporter.sendMail({
-        from: `"DOKRAN" <${process.env.EMAIL_USER}>`,
-        to: email,
-        subject: "Password Reset Request",
-        html: `
-          <h1>Password Reset Request</h1>
-          <p>You requested to reset your password. Click the link below to reset it. This link is valid for 1 hour.</p>
-          <br/>
-          <a href="${resetUrl}" style="padding: 10px 20px; background-color: black; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a>
-          <br/><br/>
-          <p>If you didn't request this, you can safely ignore this email.</p>
-        `,
-      });
+        // Send email
+        await transporter.sendMail({
+          from: `"DOKRAN" <${process.env.EMAIL_USER}>`,
+          to: email,
+          subject: "Password Reset Request",
+          html: `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+              <h1 style="font-size: 24px; font-weight: 800; text-align: center;">Password Reset Request</h1>
+              <p style="color: #666; line-height: 1.6;">You requested to reset your password for your DOKRAN account. Click the button below to set a new password. This link is only valid for 1 hour.</p>
+              <div style="text-align: center; margin: 30px 0;">
+                <a href="${resetUrl}" style="background-color: #000; color: #fff; padding: 15px 30px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">Reset Password</a>
+              </div>
+              <p style="color: #999; font-size: 12px; text-align: center;">If you didn't request this, you can safely ignore this email.</p>
+            </div>
+          `,
+        });
+      } catch (emailError) {
+        console.error("Failed to send email:", emailError);
+        // We still return 200/success message to the client to avoid enumeration/leaking info,
+        // but we'll have a record of the failure in the logs.
+      }
     }
 
     return NextResponse.json({ message: "If this email is registered, a reset link was sent." });

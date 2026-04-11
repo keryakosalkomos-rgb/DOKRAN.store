@@ -99,7 +99,7 @@ export default function Navbar() {
               <div className="flex items-center gap-4">
                 <Link href="/profile" className="flex items-center gap-2 hover:text-indigo-600 transition-colors text-neutral-600">
                   <User className="w-5 h-5" />
-                  <span className="hidden lg:inline">My Orders</span>
+                  <span className="hidden lg:inline">{t("profile.myOrders")}</span>
                 </Link>
                 <button
                   onClick={() => {
@@ -107,7 +107,7 @@ export default function Navbar() {
                     signOut({ callbackUrl: "/" });
                   }}
                   className="flex items-center gap-2 hover:text-red-600 transition-colors text-neutral-400"
-                  title={t("nav.signOut") || "Sign Out"}
+                  title={t("nav.signOut")}
                 >
                   <LogOut className="w-5 h-5" />
                 </button>
@@ -120,8 +120,8 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Cart (Hidden for Guests & Admins) */}
-          {session && !isAdminPage && (
+          {/* Cart (Visible for all except on Admin pages) */}
+          {!isAdminPage && (
             <Link href="/cart" className="relative p-2 hover:bg-neutral-50 rounded-xl transition-colors">
               <ShoppingBag className="w-5 h-5" />
               {cartCount > 0 && (
@@ -139,8 +139,8 @@ export default function Navbar() {
               className="flex items-center gap-1.5 md:gap-2 bg-black text-white px-3 py-1.5 md:px-4 md:py-2 rounded-full text-[10px] md:text-xs font-black hover:bg-neutral-800 transition-all active:scale-95 shadow-lg"
             >
               <Download className="w-3 h-3 md:w-4 md:h-4" />
-              <span className="hidden sm:inline">{isRTL ? "تحميل التطبيق" : "Install App"}</span>
-              <span className="sm:hidden">{isRTL ? "تثبيت" : "Install"}</span>
+              <span className="hidden sm:inline">{t("nav.installApp")}</span>
+              <span className="sm:hidden">{t("nav.installShort") || (isRTL ? "تثبيت" : "Install")}</span>
             </button>
           )}
         </div>
@@ -199,7 +199,7 @@ export default function Navbar() {
                       className="w-full flex items-center justify-center gap-3 py-3 bg-indigo-50 text-indigo-700 rounded-2xl font-bold"
                     >
                       <User className="w-5 h-5" />
-                      My Orders
+                      {t("profile.myOrders")}
                     </Link>
                     <button
                       onClick={() => {
@@ -209,7 +209,7 @@ export default function Navbar() {
                       className="w-full flex items-center justify-center gap-3 py-3 bg-neutral-100 rounded-2xl font-bold text-red-600"
                     >
                       <LogOut className="w-5 h-5" />
-                      {t("nav.signOut") || "Sign Out"}
+                      {t("nav.signOut")}
                     </button>
                   </div>
                 ) : (
@@ -233,7 +233,7 @@ export default function Navbar() {
                     className="w-full flex items-center justify-center gap-3 py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-lg shadow-indigo-200 active:scale-95 transition-all"
                   >
                     <Download className="w-5 h-5" />
-                    {isRTL ? "تحميل التطبيق الآن" : "Install App Now"}
+                    {t("nav.installAppNow")}
                   </button>
                 )}
 

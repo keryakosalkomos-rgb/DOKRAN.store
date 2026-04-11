@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { Loader2 } from "lucide-react";
@@ -10,6 +10,9 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 export default function RegisterPage() {
   const { t } = useLanguage();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,7 +36,7 @@ export default function RegisterPage() {
       if (!res.ok) {
         setError(data.error || "Something went wrong");
       } else {
-        router.push("/login?registered=true");
+        router.push(`/login?registered=true&callbackUrl=${encodeURIComponent(callbackUrl)}`);
       }
     } catch (err) {
       setError("An unexpected error occurred");
@@ -114,7 +117,7 @@ export default function RegisterPage() {
             <div className="mt-6 grid gap-3">
               <button
                 type="button"
-                onClick={() => signIn("google", { callbackUrl: "/" })}
+                onClick={() => signIn("google", { callbackUrl })}
                 className="w-full flex items-center justify-center gap-3 bg-white border border-neutral-300 rounded-lg px-4 py-3 text-sm font-bold text-neutral-700 hover:bg-neutral-50 transition-colors"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -131,7 +134,7 @@ export default function RegisterPage() {
 
           <div className="mt-8 text-center text-sm font-medium text-neutral-600">
             {t("auth.hasAccount")}{" "}
-            <Link href="/login" className="text-black hover:underline font-semibold mx-1">
+            <Link href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="text-black hover:underline font-semibold mx-1">
               {t("nav.signIn")}
             </Link>
           </div>

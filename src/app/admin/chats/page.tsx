@@ -47,7 +47,7 @@ export default function AdminChatsPage() {
   const selectedUser = users.find(u => u._id === selectedUserId);
 
   return (
-    <div className="min-h-[calc(100vh-120px)] flex flex-col" dir={isRTL ? "rtl" : "ltr"}>
+    <div className="h-[calc(100vh-140px)] flex flex-col" dir={isRTL ? "rtl" : "ltr"}>
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
         <h1 className="text-3xl font-black tracking-tight">
           {t("chat.adminPageTitle")}
@@ -62,7 +62,7 @@ export default function AdminChatsPage() {
         )}
       </div>
 
-      <div className="flex-1 flex flex-col lg:grid lg:grid-cols-3 gap-8 min-h-0">
+      <div className="flex-1 flex flex-col lg:grid lg:grid-cols-3 gap-8 min-h-0 overflow-hidden">
         {/* Sidebar: List of users - Hidden on mobile if a chat is selected */}
         <div className={`lg:col-span-1 bg-white rounded-3xl border border-neutral-100 shadow-sm overflow-hidden flex flex-col ${selectedUserId ? "hidden lg:flex" : "flex"}`}>
           <div className="p-4 md:p-6 border-b bg-neutral-50/50 space-y-4">

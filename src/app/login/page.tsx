@@ -2,14 +2,20 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Loader2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
+import { useCartStore, CartItem } from "@/store/useCartStore";
 
 export default function LoginPage() {
   const { t } = useLanguage();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  
+  const { items: localItems, setItems } = useCartStore();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -30,7 +36,7 @@ export default function LoginPage() {
       if (res?.error) {
         setError("Invalid email or password");
       } else {
-        router.push("/");
+        router.push(callbackUrl);
         router.refresh();
       }
     } catch (err) {
@@ -104,7 +110,7 @@ export default function LoginPage() {
             <div className="mt-6 grid gap-3">
               <button
                 type="button"
-                onClick={() => signIn("google", { callbackUrl: "/" })}
+                onClick={() => signIn("google", { callbackUrl })}
                 className="w-full flex items-center justify-center gap-3 bg-white border border-neutral-300 rounded-lg px-4 py-3 text-sm font-bold text-neutral-700 hover:bg-neutral-50 transition-colors"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -121,7 +127,7 @@ export default function LoginPage() {
 
           <div className="mt-8 text-center text-sm font-medium text-neutral-600">
             {t("auth.noAccount")}{" "}
-            <Link href="/register" className="text-black hover:underline font-semibold mx-1">
+            <Link href={`/register?callbackUrl=${encodeURIComponent(callbackUrl)}`} className="text-black hover:underline font-semibold mx-1">
               {t("auth.createAccount")}
             </Link>
           </div>

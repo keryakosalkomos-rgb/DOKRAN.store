@@ -7,6 +7,7 @@ import { getLocale, getTranslations } from "@/lib/i18n/server";
 import Providers from "@/components/Providers";
 import FloatingChat from "@/components/ui/FloatingChat";
 import InstallPrompt from "@/components/pwa/InstallPrompt";
+import CartSync from "@/components/cart/CartSync";
 
 const inter = Inter({ subsets: ["latin"] });
 const cairo = Cairo({ subsets: ["arabic"] });
@@ -35,6 +36,7 @@ export default async function RootLayout({
             <main className="flex-grow">{children}</main>
             <FloatingChat />
             <InstallPrompt />
+            <CartSync />
             <footer className="bg-neutral-900 text-white py-8 text-center mt-12">
               <p className="text-sm opacity-70">© {new Date().getFullYear()} {translations["footer.rights"] || "DS Fashion. All rights reserved."}</p>
             </footer>

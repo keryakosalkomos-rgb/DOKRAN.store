@@ -51,8 +51,22 @@ export default function ChatBox({ conversationId, viewerRole, title, onClose }: 
   useEffect(() => {
     fetchMessages();
     pollRef.current = setInterval(fetchMessages, 3000);
+    
+    // Load draft from localStorage
+    const savedDraft = localStorage.getItem(`chat_draft_${conversationId}`);
+    if (savedDraft) setText(savedDraft);
+
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
   }, [conversationId, apiEndpoint]);
+
+  // Save draft to localStorage whenever text changes
+  useEffect(() => {
+    if (text) {
+      localStorage.setItem(`chat_draft_${conversationId}`, text);
+    } else {
+      localStorage.removeItem(`chat_draft_${conversationId}`);
+    }
+  }, [text, conversationId]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -71,6 +85,7 @@ export default function ChatBox({ conversationId, viewerRole, title, onClose }: 
       });
       if (res.ok) {
         setText("");
+        localStorage.removeItem(`chat_draft_${conversationId}`);
         setError("");
         await fetchMessages();
       } else {

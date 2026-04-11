@@ -3,12 +3,14 @@
 import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token");
   const email = searchParams.get("email");
   const router = useRouter();
+  const { t } = useLanguage();
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -57,8 +59,8 @@ function ResetPasswordForm() {
   return (
     <div className="w-full">
       <div className="text-center mb-8">
-        <h1 className="text-2xl font-black tracking-tighter mb-2">Reset Password</h1>
-        <p className="text-neutral-500 font-medium text-sm">Create a new password for {email}</p>
+        <h1 className="text-2xl font-black tracking-tighter mb-2">{t("auth.resetTitle")}</h1>
+        <p className="text-neutral-500 font-medium text-sm">{t("auth.resetDesc")}</p>
       </div>
 
       {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-6 font-medium text-center">{error}</div>}
@@ -66,7 +68,7 @@ function ResetPasswordForm() {
 
       <form onSubmit={handleSubmit} className="space-y-5 text-start">
         <div>
-          <label className="block text-sm font-semibold mb-2">New Password</label>
+          <label className="block text-sm font-semibold mb-2">{t("auth.newPassword")}</label>
           <input
             type="password"
             value={password}
@@ -77,7 +79,7 @@ function ResetPasswordForm() {
           />
         </div>
         <div>
-          <label className="block text-sm font-semibold mb-2">Confirm New Password</label>
+          <label className="block text-sm font-semibold mb-2">{t("auth.confirmNewPassword")}</label>
           <input
             type="password"
             value={confirmPassword}
@@ -93,7 +95,7 @@ function ResetPasswordForm() {
           disabled={loading || !!message}
           className="w-full bg-black text-white font-bold rounded-lg py-3 mt-4 hover:bg-neutral-800 transition-colors flex justify-center items-center"
         >
-          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Reset Password"}
+          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : t("auth.resetTitle")}
         </button>
       </form>
     </div>

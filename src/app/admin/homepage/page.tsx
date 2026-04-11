@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Save, Loader2, Plus, Trash2, Globe, CheckCircle, UploadCloud } from "lucide-react";
+import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface HomeCollection {
   id: string;
@@ -11,6 +12,7 @@ interface HomeCollection {
 }
 
 export default function AdminHomepagePage() {
+  const { t } = useLanguage();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -118,7 +120,7 @@ export default function AdminHomepagePage() {
 
   return (
     <div className="max-w-4xl">
-      <h1 className="text-3xl font-bold tracking-tight mb-8">Homepage Layout</h1>
+      <h1 className="text-3xl font-bold tracking-tight mb-8">{t("admin.homepageLayout")}</h1>
       
       <form onSubmit={handleSave}>
         <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-8 mb-8">
@@ -127,7 +129,7 @@ export default function AdminHomepagePage() {
             Hero Section
           </h2>
           <div>
-            <label className="block text-sm font-medium mb-2">Main Background Image</label>
+            <label className="block text-sm font-medium mb-2">{t("admin.bgImage")}</label>
             <div className="flex gap-2">
               <input 
                 type="text" 
@@ -138,7 +140,7 @@ export default function AdminHomepagePage() {
               />
               <label className="bg-neutral-200 hover:bg-neutral-300 transition-colors text-black px-4 py-2 rounded-lg cursor-pointer flex items-center font-bold text-sm whitespace-nowrap">
                 {uploadingHero ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <UploadCloud className="w-4 h-4 mr-2" />}
-                Upload
+                {t("admin.addBtn")}
                 <input 
                   type="file" 
                   accept="image/*" 
@@ -170,18 +172,18 @@ export default function AdminHomepagePage() {
               onClick={addCollection}
               className="bg-neutral-100 text-black px-4 py-2 rounded-lg text-sm font-bold flex items-center hover:bg-neutral-200 transition-colors"
             >
-              <Plus className="w-4 h-4 mr-1" /> Add Collection
+              <Plus className="w-4 h-4 mr-1" /> {t("admin.collection")}
             </button>
           </div>
 
           <div className="space-y-6">
             {homeCollections.length === 0 ? (
-              <p className="text-center text-neutral-500 py-8">No collections added. The homepage will be empty.</p>
+              <p className="text-center text-neutral-500 py-8">{t("admin.noCollections")}</p>
             ) : (
               homeCollections.map((collection, index) => (
                 <div key={collection.id} className="border border-neutral-200 rounded-xl p-6 bg-neutral-50/50">
                   <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-bold">Collection {index + 1}</h3>
+                    <h3 className="font-bold">{t("admin.collection")} {index + 1}</h3>
                     <button 
                       type="button" 
                       onClick={() => removeCollection(collection.id)}
@@ -193,7 +195,7 @@ export default function AdminHomepagePage() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-medium mb-1 text-neutral-500">Title</label>
+                      <label className="block text-xs font-medium mb-1 text-neutral-500">{t("admin.nameTh")}</label>
                       <input 
                         type="text" 
                         value={collection.title} 
@@ -204,7 +206,7 @@ export default function AdminHomepagePage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-medium mb-1 text-neutral-500">Link Category</label>
+                      <label className="block text-xs font-medium mb-1 text-neutral-500">{t("admin.collectionLink")}</label>
                       <select 
                         value={collection.link.replace('/products?category=', '')} 
                         onChange={(e) => updateCollection(collection.id, 'link', `/products?category=${e.target.value}`)} 
@@ -218,7 +220,7 @@ export default function AdminHomepagePage() {
                       </select>
                     </div>
                     <div className="md:col-span-2">
-                      <label className="block text-xs font-medium mb-1 text-neutral-500">Image</label>
+                      <label className="block text-xs font-medium mb-1 text-neutral-500">{t("admin.preview")}</label>
                       <div className="flex gap-2">
                         <input 
                           type="text" 
@@ -230,7 +232,7 @@ export default function AdminHomepagePage() {
                         />
                         <label className="bg-neutral-200 hover:bg-neutral-300 transition-colors text-black px-3 py-2 rounded-lg cursor-pointer flex items-center font-bold text-xs whitespace-nowrap">
                           {uploadingCollectionId === collection.id ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : <UploadCloud className="w-3 h-3 mr-1" />}
-                          Upload
+                          {t("admin.addBtn")}
                           <input 
                             type="file" 
                             accept="image/*" 
@@ -264,9 +266,9 @@ export default function AdminHomepagePage() {
              className="bg-black text-white px-8 py-3 rounded-xl font-bold flex items-center hover:bg-neutral-800 disabled:opacity-50 transition-colors"
            >
              {saving ? <Loader2 className="w-5 h-5 mr-2 animate-spin" /> : <Save className="w-5 h-5 mr-2" />} 
-             Save Homepage Layout
+             {t("admin.saveSettings")}
            </button>
-           {success && <span className="text-green-600 flex items-center text-sm font-bold"><CheckCircle className="w-5 h-5 mr-2" /> Saved successfully</span>}
+           {success && <span className="text-green-600 flex items-center text-sm font-bold"><CheckCircle className="w-5 h-5 mr-2" /> {t("admin.saveSettings")}</span>}
         </div>
       </form>
     </div>

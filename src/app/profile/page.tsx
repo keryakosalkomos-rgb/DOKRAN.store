@@ -39,8 +39,8 @@ export default function ProfilePage() {
   if (status === "unauthenticated") {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center pt-24 px-4 text-center">
-        <h1 className="text-3xl font-black tracking-tight mb-4">Access Denied</h1>
-        <p className="text-neutral-500 mb-8 max-w-md mx-auto">Please sign in to view your orders and manage your profile.</p>
+        <h1 className="text-3xl font-black tracking-tight mb-4">{t("profile.accessDenied")}</h1>
+        <p className="text-neutral-500 mb-8 max-w-md mx-auto">{t("profile.accessDeniedDesc")}</p>
         <Link href="/login" className="bg-black text-white px-8 py-3 rounded-full font-bold shadow-lg hover:scale-105 transition-all">
           {t("nav.signIn")}
         </Link>
@@ -53,7 +53,7 @@ export default function ProfilePage() {
       <div className="max-w-5xl mx-auto px-6">
         <div className="bg-white rounded-[2rem] shadow-sm border border-neutral-100 p-8 mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-black mb-2">Welcome, {(session?.user as any)?.name}</h1>
+            <h1 className="text-3xl font-black mb-2">{t("profile.welcome")}, {(session?.user as any)?.name}</h1>
             <p className="text-neutral-500 font-medium">{(session?.user as any)?.email}</p>
           </div>
           <div className="w-16 h-16 bg-neutral-100 rounded-full flex items-center justify-center text-xl font-bold">
@@ -61,20 +61,20 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <h2 className="text-2xl font-black mb-6">My Orders</h2>
+        <h2 className="text-2xl font-black mb-6">{t("profile.myOrders")}</h2>
 
         <div className="flex gap-2 mb-6 p-1 bg-neutral-200/50 rounded-xl inline-flex">
           <button
             onClick={() => setActiveTab("standard")}
             className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${activeTab === "standard" ? "bg-white text-black shadow-sm" : "text-neutral-500 hover:text-black"}`}
           >
-            Standard Orders
+            {t("admin.standardOrders")}
           </button>
           <button
             onClick={() => setActiveTab("custom")}
             className={`px-6 py-2 rounded-lg font-bold text-sm transition-all ${activeTab === "custom" ? "bg-white text-black shadow-sm" : "text-neutral-500 hover:text-black"}`}
           >
-            Custom Designs
+            {t("admin.customAiOrders")}
           </button>
         </div>
 
@@ -83,14 +83,14 @@ export default function ProfilePage() {
             {orders.length === 0 ? (
               <div className="bg-white rounded-3xl border border-neutral-100 p-12 text-center text-neutral-400">
                 <Package className="w-12 h-12 mx-auto mb-4 opacity-20" />
-                <p className="font-medium text-lg text-neutral-500">No standard orders found.</p>
+                <p className="font-medium text-lg text-neutral-500">{t("profile.noOrders")}</p>
               </div>
             ) : (
               orders.map((order) => (
                 <div key={order._id} className="bg-white border rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b pb-4">
                     <div>
-                      <p className="text-xs text-neutral-400 font-bold uppercase tracking-wider mb-1">Order ID: {order._id.slice(-8).toUpperCase()}</p>
+                      <p className="text-xs text-neutral-400 font-bold uppercase tracking-wider mb-1">{t("profile.orderId")}: {order._id.slice(-8).toUpperCase()}</p>
                       <p className="text-sm font-medium">{new Date(order.createdAt).toLocaleDateString()}</p>
                     </div>
                     <div className="flex flex-col items-end gap-1">
@@ -112,7 +112,7 @@ export default function ProfilePage() {
                         <img src={item.image} alt="" className="w-12 h-12 rounded-l-xl object-cover" />
                         <div>
                           <p className="text-xs font-bold max-w-[120px] truncate">{item.name}</p>
-                          <p className="text-[10px] text-neutral-500">Qty: {item.quantity}</p>
+                          <p className="text-[10px] text-neutral-500">{t("checkout.qty")}: {item.quantity}</p>
                         </div>
                       </div>
                     ))}
@@ -128,7 +128,7 @@ export default function ProfilePage() {
             {customOrders.length === 0 ? (
               <div className="bg-white rounded-3xl border border-neutral-100 p-12 text-center text-neutral-400">
                 <Shirt className="w-12 h-12 mx-auto mb-4 opacity-20" />
-                <p className="font-medium text-lg text-neutral-500">No custom designs found.</p>
+                <p className="font-medium text-lg text-neutral-500">{t("profile.noCustom")}</p>
                 <Link href="/custom-design" className="mt-4 inline-block text-indigo-600 font-bold hover:underline">Start a new design request →</Link>
               </div>
             ) : (
@@ -144,7 +144,7 @@ export default function ProfilePage() {
                   <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <p className="text-xs text-neutral-400 font-bold uppercase tracking-wider">Design ID: {order._id.slice(-8).toUpperCase()}</p>
+                        <p className="text-xs text-neutral-400 font-bold uppercase tracking-wider">{t("profile.designId")}: {order._id.slice(-8).toUpperCase()}</p>
                         <span className="bg-neutral-100 px-2 py-0.5 rounded text-[10px] font-bold uppercase">{order.status}</span>
                       </div>
                       <p className="text-sm text-neutral-600 line-clamp-2 max-w-xl leading-relaxed mb-4">{order.description}</p>
@@ -159,7 +159,7 @@ export default function ProfilePage() {
                       
                       {order.status === "Confirmed" ? (
                         <div className="w-full">
-                          <p className="text-xs text-center text-neutral-500 mb-2 font-medium">Price is ready for approval</p>
+                          <p className="text-xs text-center text-neutral-500 mb-2 font-medium">{t("profile.priceReadyApproval")}</p>
                           <Link 
                             href={`/checkout/custom/${order._id}`}
                             className="w-full block text-center bg-indigo-600 text-white px-4 py-2.5 rounded-xl font-bold shadow-md hover:bg-indigo-700 transition-colors"

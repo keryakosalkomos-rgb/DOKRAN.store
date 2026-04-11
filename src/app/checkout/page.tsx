@@ -9,10 +9,11 @@ import Link from "next/link";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 export default function CheckoutPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const isRTL = lang === "ar";
   const router = useRouter();
   const { items, cartTotal, clearCart } = useCartStore();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
   const [loadingSettings, setLoadingSettings] = useState(true);
@@ -23,10 +24,25 @@ export default function CheckoutPage() {
     instaPayNumber: "",
     mobileWalletNumber: "",
     bankAccountDetails: "",
-    fixedShippingPrice: 0,
+  });
+  const [governorates, setGovernorates] = useState<any[]>([]);
+  const [shippingPrice, setShippingPrice] = useState(0);
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    phone: "",
+    address: "",
+    city: "",
+    notes: "",
+    paymentMethod: "Cash on Delivery",
   });
 
   useEffect(() => {
+    if (status === "unauthenticated") {
+      router.push("/login?callbackUrl=" + encodeURIComponent(window.location.href));
+      return;
+    }
+    
     if (session) {
       fetch("/api/user/profile")
         .then(res => {
@@ -40,14 +56,23 @@ export default function CheckoutPage() {
               fullName: data.user.name || prev.fullName,
               phone: data.user.phone || prev.phone,
               address: data.user.address || prev.address,
-              city: data.user.city || prev.city,
-              country: data.user.country || prev.country
+              city: data.user.city || prev.city
             }));
           }
         })
         .catch(console.error);
     }
-  }, [session]);
+  }, [session, status]);
+
+  // Effect to handle shipping price calculation when city or governorates list changes
+  useEffect(() => {
+    if (formData.city && governorates.length > 0) {
+      const gov = governorates.find(g => g.name === formData.city || g.nameAr === formData.city || g.id === formData.city);
+      if (gov) {
+        setShippingPrice(gov.price);
+      }
+    }
+  }, [formData.city, governorates]);
 
   useEffect(() => {
     fetch("/api/admin/settings")
@@ -58,8 +83,16 @@ export default function CheckoutPage() {
             instaPayNumber: data.instaPayNumber || "",
             mobileWalletNumber: data.mobileWalletNumber || "",
             bankAccountDetails: data.bankAccountDetails || "",
-            fixedShippingPrice: Number(data.fixedShippingPrice) || 0,
           });
+        }
+      })
+      .catch(console.error);
+
+    fetch("/api/admin/settings/shipping")
+      .then(res => res.json())
+      .then(data => {
+        if (data.governorates) {
+          setGovernorates(data.governorates);
         }
       })
       .finally(() => setLoadingSettings(false));
@@ -91,18 +124,18 @@ export default function CheckoutPage() {
     }
   };
 
-  const [formData, setFormData] = useState({
-    fullName: "",
-    phone: "",
-    address: "",
-    city: "",
-    country: "",
-    notes: "",
-    paymentMethod: "Cash on Delivery",
-  });
+
 
   const handleChange = (e: any) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    
+    if (name === "city") {
+      const gov = governorates.find(g => g.name === value || g.nameAr === value || g.id === value);
+      if (gov) {
+        setShippingPrice(gov.price);
+      }
+    }
   };
 
   const handleSubmit = async (e: any) => {
@@ -124,13 +157,12 @@ export default function CheckoutPage() {
         phone: formData.phone,
         address: formData.address,
         city: formData.city,
-        country: formData.country,
+        country: "Egypt", // Defaulting to Egypt
       };
 
       // 1. Process Standard Order
       if (standardItems.length > 0) {
         const itemsPrice = standardItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-        const shippingPrice = platformSettings.fixedShippingPrice;
         const finalTotal = itemsPrice + shippingPrice;
 
         const res = await fetch("/api/orders", {
@@ -230,14 +262,23 @@ export default function CheckoutPage() {
               <input required type="text" name="address" value={formData.address} onChange={handleChange} className="w-full border rounded-md px-4 py-2 outline-none focus:ring-2 focus:ring-black" />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6">
                <div>
                 <label className="block text-sm font-medium mb-1">{t("custom.city")}</label>
-                <input required type="text" name="city" value={formData.city} onChange={handleChange} className="w-full border rounded-md px-4 py-2 outline-none focus:ring-2 focus:ring-black" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">{t("custom.country")}</label>
-                <input required type="text" name="country" value={formData.country} onChange={handleChange} className="w-full border rounded-md px-4 py-2 outline-none focus:ring-2 focus:ring-black" />
+                <select 
+                  required 
+                  name="city" 
+                  value={formData.city} 
+                  onChange={handleChange} 
+                  className="w-full border rounded-md px-4 py-2 outline-none focus:ring-2 focus:ring-black bg-white"
+                >
+                  <option value="">{isRTL ? "اختر المحافظة" : "Select Governorate"}</option>
+                  {governorates.map(gov => (
+                    <option key={gov.id} value={gov.name}>
+                      {isRTL ? gov.nameAr : gov.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
@@ -299,7 +340,7 @@ export default function CheckoutPage() {
                         ) : paymentProof ? (
                           <>
                             <CheckCircle className="w-8 h-8 text-green-500 mb-2" />
-                            <p className="text-sm font-bold text-green-700">Screenshot Uploaded!</p>
+                            <p className="text-sm font-bold text-green-700">{t("checkout.proofUploaded")}</p>
                             <img src={paymentProof} className="w-20 h-20 object-cover rounded mt-2 border" alt="Proof" />
                           </>
                         ) : (
@@ -313,6 +354,15 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {formData.paymentMethod === "Cash on Delivery" && (
+                <div className="mt-6 p-5 bg-indigo-50/50 rounded-2xl border border-indigo-100 flex items-start gap-3">
+                    <Info className="w-5 h-5 text-indigo-600 shrink-0 mt-0.5" />
+                    <p className="text-sm font-bold text-indigo-900 leading-relaxed">
+                      {t("checkout.codInstruction")}
+                    </p>
                 </div>
               )}
 
@@ -355,14 +405,14 @@ export default function CheckoutPage() {
               <div className="flex justify-between items-center text-sm">
                 <span className="text-neutral-600">Shipping</span>
                 <span className="font-bold text-indigo-600">
-                  {platformSettings.fixedShippingPrice > 0 ? `+${platformSettings.fixedShippingPrice} ${t("common.currency")}` : "Free"}
+                  {shippingPrice > 0 ? `+${shippingPrice} ${t("common.currency")}` : "Free"}
                 </span>
               </div>
             </div>
 
             <div className="flex justify-between text-xl font-extrabold border-t pt-4 mb-8">
               <span>{t("cart.total")}</span>
-              <span>{(cartTotal() + platformSettings.fixedShippingPrice)} {t("common.currency")}</span>
+              <span>{(cartTotal() + shippingPrice)} {t("common.currency")}</span>
             </div>
 
             <button

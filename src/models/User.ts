@@ -7,6 +7,7 @@ export interface IUser {
   phone?: string;
   address?: string;
   fcmTokens?: string[];
+  cart?: any[]; 
   createdAt?: string;
   updatedAt?: string;
 }

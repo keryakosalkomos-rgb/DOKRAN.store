@@ -43,8 +43,8 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-neutral-50 px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-neutral-100 p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-black tracking-tighter mb-2">Forgot Password</h1>
-          <p className="text-neutral-500 font-medium text-sm">Enter your email to receive a password reset link.</p>
+          <h1 className="text-3xl font-black tracking-tighter mb-2">{t("auth.forgotTitle")}</h1>
+          <p className="text-neutral-500 font-medium text-sm">{t("auth.forgotDesc")}</p>
         </div>
 
         {error && <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm mb-6 font-medium text-center">{error}</div>}

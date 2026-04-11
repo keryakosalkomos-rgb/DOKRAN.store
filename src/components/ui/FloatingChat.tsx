@@ -24,14 +24,20 @@ export default function FloatingChat() {
         const res = await fetch("/api/chat/conversation/unread");
         if (res.ok) {
           const data = await res.json();
-          // Show the widget if there are any messages at all (or if admin initiated)
-          // For now, let's just check if the conversation exists/has messages
-          const msgRes = await fetch("/api/chat/conversation");
+          setHasMessages(data.count > 0);
+        }
+        
+        // Secondary check for conversation status
+        const msgRes = await fetch("/api/chat/conversation");
+        if (msgRes.ok) {
           const msgData = await msgRes.json();
-          setHasMessages(msgData.messages?.length > 0);
+          if (msgData && msgData.messages) {
+            setHasMessages(prev => prev || msgData.messages.length > 0);
+          }
         }
       } catch (e) {
-        console.error(e);
+        // Silently caught to prevent Next.js red screen on network flakiness
+        console.debug("FloatingChat: background check failed (expected during dev/restart)", e);
       } finally {
         setLoading(false);
       }

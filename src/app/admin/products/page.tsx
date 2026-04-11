@@ -25,13 +25,13 @@ export default function AdminProductsPage() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [stock, setStock] = useState("0");
+  const [serialNumber, setSerialNumber] = useState("");
   const [mainCategoryId, setMainCategoryId] = useState("");
   const [subCategoryId, setSubCategoryId] = useState("");
-  const [selectedSizes, setSelectedSizes] = useState<any[]>([]);
+  const [variants, setVariants] = useState<any[]>([]);
+  const [currentVariantColor, setCurrentVariantColor] = useState("#000000");
   const [sizeInput, setSizeInput] = useState("");
   const [sizeQuantity, setSizeQuantity] = useState("0");
-  const [colorInput, setColorInput] = useState("#000000");
-  const [colors, setColors] = useState<string[]>([]);
   const [images, setImages] = useState<string[]>([]);
   const [isFeatured, setIsFeatured] = useState(false);
 
@@ -49,22 +49,48 @@ export default function AdminProductsPage() {
     setLoading(false);
   };
 
-  const addSize = () => {
-    const s = sizeInput.trim().toUpperCase();
-    const q = parseInt(sizeQuantity) || 0;
-    if (s && !selectedSizes.find(x => (typeof x === 'string' ? x : x.size) === s)) {
-      setSelectedSizes(prev => [...prev, { size: s, quantity: q }]);
+  const addVariant = () => {
+    if (!variants.find(v => v.color === currentVariantColor)) {
+      setVariants([...variants, { color: currentVariantColor, sizes: [] }]);
     }
-    setSizeInput("");
-    setSizeQuantity("0");
   };
 
-  const addColor = () => { if (!colors.includes(colorInput)) setColors([...colors, colorInput]); };
+  const addSizeToVariant = (color: string) => {
+    const s = sizeInput.trim().toUpperCase();
+    const q = parseInt(sizeQuantity) || 0;
+    if (s) {
+      setVariants(prev => prev.map(v => {
+        if (v.color === color) {
+          const existingSize = v.sizes.find((x: any) => x.size === s);
+          if (existingSize) {
+            return { ...v, sizes: v.sizes.map((x: any) => x.size === s ? { ...x, quantity: q } : x) };
+          }
+          return { ...v, sizes: [...v.sizes, { size: s, quantity: q }] };
+        }
+        return v;
+      }));
+      setSizeInput("");
+      setSizeQuantity("0");
+    }
+  };
+
+  const removeSizeFromVariant = (color: string, size: string) => {
+    setVariants(prev => prev.map(v => {
+      if (v.color === color) {
+        return { ...v, sizes: v.sizes.filter((s: any) => s.size !== size) };
+      }
+      return v;
+    }));
+  };
+
+  const removeVariant = (color: string) => {
+    setVariants(prev => prev.filter(v => v.color !== color));
+  };
 
   const resetForm = () => {
-    setName(""); setDescription(""); setPrice(""); setStock("0"); setMainCategoryId(""); setSubCategoryId("");
-    setSelectedSizes([]); setSizeInput(""); setSizeQuantity("0"); setColors([]); setImages([]); setIsFeatured(false);
-    setColorInput("#000000"); setError(""); setEditingId(null);
+    setName(""); setDescription(""); setPrice(""); setStock("0"); setSerialNumber(""); setMainCategoryId(""); setSubCategoryId("");
+    setVariants([]); setSizeInput(""); setSizeQuantity("0"); setImages([]); setIsFeatured(false);
+    setCurrentVariantColor("#000000"); setError(""); setEditingId(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -73,10 +99,24 @@ export default function AdminProductsPage() {
     const url = editingId ? `/api/admin/products/${editingId}` : "/api/admin/products";
     const method = editingId ? "PUT" : "POST";
     const finalCategoryId = subCategoryId || mainCategoryId;
+    
+    // Calculate total stock from variants
+    const totalStock = variants.reduce((acc, v) => acc + v.sizes.reduce((sAcc: number, s: any) => sAcc + (parseInt(s.quantity) || 0), 0), 0);
+    
     const res = await fetch(url, {
       method,
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, description, price, stock, category: finalCategoryId, sizes: selectedSizes, colors, images, isFeatured }),
+      body: JSON.stringify({ 
+        name, 
+        description, 
+        price, 
+        stock: totalStock, 
+        category: finalCategoryId, 
+        variants, 
+        images, 
+        isFeatured,
+        serialNumber
+      }),
     });
     const data = await res.json();
     if (!res.ok) { setError(data.error); }
@@ -90,6 +130,7 @@ export default function AdminProductsPage() {
     setDescription((product as any).description || "");
     setPrice(product.price.toString());
     setStock(product.stock.toString());
+    setSerialNumber((product as any).serialNumber || "");
     const pCatId = (product as any).category?._id || (product as any).category || "";
     const pCat = categories.find(c => c._id === pCatId);
     if (pCat?.parent) {
@@ -99,8 +140,7 @@ export default function AdminProductsPage() {
       setMainCategoryId(pCat?._id || "");
       setSubCategoryId("");
     }
-    setSelectedSizes((product as any).sizes || []);
-    setColors((product as any).colors || []);
+    setVariants((product as any).variants || []);
     setImages(product.images || []);
     setIsFeatured(product.isFeatured);
     setShowForm(true);
@@ -136,15 +176,15 @@ export default function AdminProductsPage() {
                   <input type="text" required value={name} onChange={e => setName(e.target.value)}
                     className="w-full border border-neutral-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-black" placeholder="DS Classic Tee" />
                 </div>
-                <div>
+                <div className="col-span-2 sm:col-span-1">
                   <label className="block text-sm font-semibold mb-1">{t("admin.priceUsd")}</label>
                   <input type="number" required min="0" step="0.01" value={price} onChange={e => setPrice(e.target.value)}
                     className="w-full border border-neutral-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-black" placeholder="100.00" />
                 </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-1">{t("admin.stockQuantity")}</label>
-                  <input type="number" min="0" value={stock} onChange={e => setStock(e.target.value)}
-                    className="w-full border border-neutral-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-black" />
+                <div className="col-span-2 sm:col-span-1">
+                  <label className="block text-sm font-semibold mb-1">{t("admin.serialNumber")}</label>
+                  <input type="text" value={serialNumber} onChange={e => setSerialNumber(e.target.value)}
+                    className="w-full border border-neutral-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-black" placeholder="SN-XXXX-XXXX" />
                 </div>
                 <div className="col-span-2 sm:col-span-1">
                   <label className="block text-sm font-semibold mb-1">{t("admin.categoryStar")}</label>
@@ -169,47 +209,47 @@ export default function AdminProductsPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold mb-2">{t("admin.availableSizes")}</label>
-                <div className="flex gap-2 mb-2">
-                  <input type="text" value={sizeInput} onChange={e => setSizeInput(e.target.value)}
-                    onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addSize(); }}}
-                    className="flex-1 border border-neutral-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-black text-sm"
-                    placeholder={t("admin.typeSize")} />
-                  <input type="number" min="0" value={sizeQuantity} onChange={e => setSizeQuantity(e.target.value)}
-                    onKeyDown={e => { if (e.key === "Enter") { e.preventDefault(); addSize(); }}}
-                    className="w-24 border border-neutral-300 rounded-lg px-4 py-2.5 outline-none focus:ring-2 focus:ring-black text-sm"
-                    placeholder="Qty" title="Quantity" />
-                  <button type="button" onClick={addSize}
-                    className="px-4 py-2 bg-neutral-900 text-white rounded-lg text-sm font-medium hover:bg-neutral-700">{t("admin.addBtn")}</button>
+              <div className="space-y-6 pt-4 border-t">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-bold">{t("admin.variantsTitle")}</h3>
+                  <div className="flex gap-2 items-center">
+                    <input type="color" value={currentVariantColor} onChange={e => setCurrentVariantColor(e.target.value)} className="w-10 h-10 cursor-pointer border-0 p-0" />
+                    <button type="button" onClick={addVariant} className="px-4 py-2 bg-black text-white rounded-lg text-sm font-bold hover:bg-neutral-800 transition-all">{t("admin.addColor")}</button>
+                  </div>
                 </div>
-                <div className="flex gap-2 flex-wrap">
-                  {selectedSizes.map(s => {
-                    const sizeName = typeof s === 'string' ? s : s.size;
-                    const sizeQty = typeof s === 'object' ? s.quantity : null;
-                    return (
-                      <span key={sizeName} className="flex items-center gap-1 bg-black text-white px-3 py-1.5 rounded-lg text-sm font-semibold">
-                        {sizeName} {sizeQty !== null && <span className="bg-white/20 px-1.5 py-0.5 rounded text-xs ml-1">Qty: {sizeQty}</span>}
-                        <button type="button" onClick={() => setSelectedSizes(prev => prev.filter(x => (typeof x === 'string' ? x : x.size) !== sizeName))}
-                          className="ml-1 opacity-70 hover:opacity-100">×</button>
-                      </span>
-                    )
-                  })}
-                </div>
-              </div>
 
-              <div>
-                <label className="block text-sm font-semibold mb-2">{t("admin.colorsLabel")}</label>
-                <div className="flex gap-2 items-center">
-                  <input type="color" value={colorInput} onChange={e => setColorInput(e.target.value)} className="w-10 h-10 cursor-pointer border-0 p-0" />
-                  <button type="button" onClick={addColor} className="px-4 py-2 bg-neutral-900 text-white rounded-lg text-sm font-medium hover:bg-neutral-700">{t("admin.addBtn")}</button>
-                </div>
-                <div className="flex gap-2 flex-wrap mt-2">
-                  {colors.map(c => (
-                    <div key={c} className="flex items-center gap-1 bg-neutral-100 px-3 py-1 rounded-full text-xs">
-                      <span className="w-4 h-4 rounded-full inline-block" style={{ background: c }} />
-                      {c}
-                      <button type="button" onClick={() => setColors(colors.filter(x => x !== c))} className="ml-1 text-neutral-400 hover:text-red-500">×</button>
+                <div className="space-y-4">
+                  {variants.map((v, vIdx) => (
+                    <div key={vIdx} className="border border-neutral-200 rounded-2xl p-6 bg-neutral-50/50">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full border border-white shadow-sm" style={{ background: v.color }} />
+                          <span className="font-bold text-sm uppercase tracking-wider">{v.color}</span>
+                        </div>
+                        <button type="button" onClick={() => removeVariant(v.color)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+
+                      <div className="flex gap-2 mb-4">
+                        <input type="text" placeholder={t("products.selectSize")} value={sizeInput} onChange={e => setSizeInput(e.target.value)}
+                          className="flex-1 border border-neutral-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black" />
+                        <input type="number" placeholder={t("checkout.qty")} value={sizeQuantity} onChange={e => setSizeQuantity(e.target.value)}
+                          className="w-20 border border-neutral-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-black" />
+                        <button type="button" onClick={() => addSizeToVariant(v.color)} className="bg-neutral-900 text-white px-4 py-2 rounded-lg text-xs font-bold">{t("admin.addSize")}</button>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2">
+                        {v.sizes.map((s: any, sIdx: number) => (
+                          <div key={sIdx} className="flex items-center gap-2 bg-white border border-neutral-200 pl-3 pr-1 py-1 rounded-xl shadow-sm">
+                            <span className="text-xs font-black">{s.size}</span>
+                            <span className="text-[10px] bg-neutral-100 px-1.5 py-0.5 rounded font-bold text-neutral-500">Qty: {s.quantity}</span>
+                            <button type="button" onClick={() => removeSizeFromVariant(v.color, s.size)} className="p-1 hover:text-red-500">
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -289,16 +329,32 @@ export default function AdminProductsPage() {
                       </div>
                       <div>
                         <p className="font-semibold">{product.name}</p>
-                        {product.isFeatured && <span className="text-xs text-yellow-600 font-medium">⭐ {t("admin.featuredBadge")}</span>}
+                        <div className="flex items-center gap-2">
+                          {product.isFeatured && <span className="text-[10px] text-yellow-600 font-medium">⭐ {t("admin.featuredBadge")}</span>}
+                          {(product as any).serialNumber && <span className="text-[10px] text-neutral-400 font-mono italic">SN: {(product as any).serialNumber}</span>}
+                        </div>
                       </div>
                     </div>
                   </td>
                   <td className="p-4 text-neutral-600">{product.category?.name || "—"}</td>
                   <td className="p-4 font-semibold">{product.price.toFixed(2)} {t("common.currency")}</td>
                   <td className="p-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${product.stock > 0 ? "bg-green-50 text-green-700" : "bg-red-50 text-red-600"}`}>
-                      {product.stock > 0 ? `${product.stock} ${t("admin.inStock")}` : t("admin.outOfStock")}
-                    </span>
+                    <div className="flex flex-col gap-1">
+                      <span className={`px-2 py-1 rounded-full text-[10px] w-fit font-bold uppercase ${product.stock > 0 ? "bg-green-50 text-green-700 border border-green-100" : "bg-red-50 text-red-600 border border-red-100"}`}>
+                        {product.stock > 0 ? `${product.stock} ${t("admin.inStock")}` : t("admin.outOfStock")}
+                      </span>
+                      {/* Variant Breakdown */}
+                      {(product as any).variants?.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {(product as any).variants.map((v: any, i: number) => (
+                            <div key={i} className="flex items-center gap-1 bg-white border border-neutral-100 px-1.5 py-0.5 rounded text-[9px] font-medium text-neutral-500 shadow-sm" title={v.color}>
+                              <div className="w-1.5 h-1.5 rounded-full" style={{ background: v.color }} />
+                              {v.sizes.map((s: any) => `${s.size}:${s.quantity}`).join(", ")}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </td>
                   <td className="p-4 text-right">
                     <div className="flex items-center justify-end gap-3">

@@ -41,7 +41,7 @@ export async function POST(request: Request) {
   }
   try {
     const body = await request.json();
-    const { name, description, price, category, stock, sizes, colors, images, isFeatured } = body;
+    const { name, description, price, category, stock, variants, images, isFeatured, serialNumber } = body;
     if (!name || !description || !price || !category) {
       return NextResponse.json({ error: "Name, description, price and category are required" }, { status: 400 });
     }
@@ -55,10 +55,10 @@ export async function POST(request: Request) {
       price: Number(price),
       category,
       stock: Number(stock) || 0,
-      sizes: sizes || [],
-      colors: colors || [],
+      variants: variants || [],
       images: images || [],
       isFeatured: isFeatured || false,
+      serialNumber: serialNumber || "",
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };

@@ -35,9 +35,19 @@ export default function ProductDetailsPage() {
         if (res.ok) {
           const data = await res.json();
           setProduct(data);
-          // Auto-select if only one option exists
-          if (data.sizes?.length === 1) setSelectedSize(data.sizes[0]);
-          if (data.colors?.length === 1) setSelectedColor(data.colors[0]);
+          // NEW: Auto-select if only one variant/color exists
+          if (data.variants && data.variants.length === 1) {
+            setSelectedColor(data.variants[0].color);
+            if (data.variants[0].sizes.length === 1) {
+              setSelectedSize(data.variants[0].sizes[0].size);
+            }
+          } else if (data.variants && data.variants.length > 0) {
+            // No auto-select for color if multiple exist
+          } else {
+            // Legacy auto-select
+            if (data.sizes?.length === 1) setSelectedSize(typeof data.sizes[0] === 'string' ? data.sizes[0] : data.sizes[0].size);
+            if (data.colors?.length === 1) setSelectedColor(data.colors[0]);
+          }
         }
       } catch (e) {
         console.error("Failed to fetch product", e);
@@ -51,21 +61,34 @@ export default function ProductDetailsPage() {
   const handleAddToCart = () => {
     if (!product) return;
 
-    if (status === "unauthenticated") {
-      router.push("/login?callbackUrl=" + encodeURIComponent(window.location.href));
-      return;
-    }
+    /* Removed mandatory login for adding to cart */
+    // if (status === "unauthenticated") { ... }
     
-    // Check required variants
-    if (product.sizes?.length > 0 && !selectedSize) {
-      setError(t("products.selectSize") || "Please select a size first");
-      setTimeout(() => setError(null), 3000);
-      return;
-    }
-    if (product.colors?.length > 0 && !selectedColor) {
-      setError(t("products.selectColor") || "Please select a color first");
-      setTimeout(() => setError(null), 3000);
-      return;
+    // Check required variants (NEW variants system)
+    if (product.variants && product.variants.length > 0) {
+      if (!selectedColor) {
+        setError(t("products.selectColor") || "Please select a color first");
+        setTimeout(() => setError(null), 3000);
+        return;
+      }
+      const variant = product.variants.find((v: any) => v.color === selectedColor);
+      if (variant?.sizes?.length > 0 && !selectedSize) {
+        setError(t("products.selectSize") || "Please select a size first");
+        setTimeout(() => setError(null), 3000);
+        return;
+      }
+    } else {
+      // Legacy variants check
+      if (product.sizes?.length > 0 && !selectedSize) {
+        setError(t("products.selectSize") || "Please select a size first");
+        setTimeout(() => setError(null), 3000);
+        return;
+      }
+      if (product.colors?.length > 0 && !selectedColor) {
+        setError(t("products.selectColor") || "Please select a color first");
+        setTimeout(() => setError(null), 3000);
+        return;
+      }
     }
     setError(null);
 
@@ -189,74 +212,146 @@ export default function ProductDetailsPage() {
 
           <div className="w-full h-px bg-neutral-100 mb-8"></div>
 
-          {/* Color Selection */}
-          {product.colors && product.colors.length > 0 && (
+          {/* Color Selection (Variants System) */}
+          {product.variants && product.variants.length > 0 ? (
             <div className="mb-8">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-sm font-bold uppercase tracking-widest">{t("products.selectColor")}</span>
               </div>
               <div className="flex flex-wrap gap-3">
-                {product.colors.map((color: string) => (
+                {product.variants.map((v: any) => (
                   <button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
+                    key={v.color}
+                    onClick={() => {
+                      setSelectedColor(v.color);
+                      setSelectedSize(null); // Reset size when color changes
+                    }}
                     className={`h-12 rounded-2xl border-2 font-bold text-sm transition-all flex items-center justify-center ${
-                      color.startsWith("#") ? "w-12 px-0 py-0" : "px-6 gap-2"
+                      v.color.startsWith("#") ? "w-12 px-0 py-0" : "px-6 gap-2"
                     } ${
-                      selectedColor === color 
+                      selectedColor === v.color 
                         ? "border-black bg-black text-white" 
                         : "border-neutral-200 bg-white text-neutral-800 hover:border-black"
                     }`}
-                    title={color}
+                    title={v.color}
                   >
-                    {/* If color looks like hex or simple color word, show a dot */}
                     <span 
-                      className={`rounded-full border border-neutral-300 shadow-inner ${color.startsWith("#") ? "w-6 h-6" : "w-4 h-4"}`} 
-                      style={{ backgroundColor: color.startsWith("#") ? color : color.toLowerCase() }}
+                      className={`rounded-full border border-neutral-300 shadow-inner ${v.color.startsWith("#") ? "w-6 h-6" : "w-4 h-4"}`} 
+                      style={{ backgroundColor: v.color.startsWith("#") ? v.color : v.color.toLowerCase() }}
                     ></span>
-                    {!color.startsWith("#") && <span>{color}</span>}
+                    {!v.color.startsWith("#") && <span>{v.color}</span>}
                   </button>
                 ))}
               </div>
             </div>
+          ) : (
+            /* Legacy Color Selection */
+            product.colors && product.colors.length > 0 && (
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-sm font-bold uppercase tracking-widest">{t("products.selectColor")}</span>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  {product.colors.map((color: string) => (
+                    <button
+                      key={color}
+                      onClick={() => setSelectedColor(color)}
+                      className={`h-12 rounded-2xl border-2 font-bold text-sm transition-all flex items-center justify-center ${
+                        color.startsWith("#") ? "w-12 px-0 py-0" : "px-6 gap-2"
+                      } ${
+                        selectedColor === color 
+                          ? "border-black bg-black text-white" 
+                          : "border-neutral-200 bg-white text-neutral-800 hover:border-black"
+                      }`}
+                      title={color}
+                    >
+                      <span 
+                        className={`rounded-full border border-neutral-300 shadow-inner ${color.startsWith("#") ? "w-6 h-6" : "w-4 h-4"}`} 
+                        style={{ backgroundColor: color.startsWith("#") ? color : color.toLowerCase() }}
+                      ></span>
+                      {!color.startsWith("#") && <span>{color}</span>}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )
           )}
 
           {/* Size Selection */}
-          {product.sizes && product.sizes.length > 0 && (
+          {product.variants && product.variants.length > 0 ? (
             <div className="mb-8">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-sm font-bold uppercase tracking-widest">{t("products.selectSize")}</span>
+                {!selectedColor && <span className="text-[10px] text-red-500 font-bold uppercase">Select color first</span>}
               </div>
               <div className="flex flex-wrap gap-3">
-                {product.sizes.map((sObj: any) => {
-                  const size = typeof sObj === 'string' ? sObj : sObj.size;
-                  const qty = typeof sObj === 'object' ? sObj.quantity : null;
-                  const isSizeOutOfStock = qty !== null && qty <= 0;
-                  return (
-                  <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    disabled={isSizeOutOfStock}
-                    className={`h-auto min-h-[3rem] py-2 px-4 rounded-xl border-2 uppercase text-sm transition-all flex flex-col items-center justify-center gap-1 ${
-                      isSizeOutOfStock ? "opacity-70 cursor-not-allowed border-neutral-200 bg-neutral-50" :
-                      selectedSize === size 
-                        ? "border-black bg-black text-white" 
-                        : "border-neutral-200 bg-white text-neutral-800 hover:border-black"
-                    }`}
-                  >
-                    <span className={`font-black ${isSizeOutOfStock ? "line-through text-neutral-400" : ""}`}>{size}</span>
-                    {isSizeOutOfStock ? (
-                      <span className="text-[10px] font-bold text-red-500 lowercase tracking-wide">out of stock</span>
-                    ) : qty !== null && qty > 0 ? (
-                      <span className={`text-[10px] font-bold lowercase tracking-wide ${selectedSize === size ? "text-white/80" : "text-emerald-600"}`}>
-                        {qty} {t("products.left") || "left"}
-                      </span>
-                    ) : null}
-                  </button>
-                  );
-                })}
+                {selectedColor ? (
+                  product.variants.find((v: any) => v.color === selectedColor)?.sizes.map((sObj: any) => {
+                    const isSizeOutOfStock = sObj.quantity <= 0;
+                    return (
+                      <button
+                        key={sObj.size}
+                        onClick={() => setSelectedSize(sObj.size)}
+                        disabled={isSizeOutOfStock}
+                        className={`h-auto min-h-[3rem] py-2 px-4 rounded-xl border-2 uppercase text-sm transition-all flex flex-col items-center justify-center gap-1 ${
+                          isSizeOutOfStock ? "opacity-70 cursor-not-allowed border-neutral-200 bg-neutral-50" :
+                          selectedSize === sObj.size 
+                            ? "border-black bg-black text-white" 
+                            : "border-neutral-200 bg-white text-neutral-800 hover:border-black"
+                        }`}
+                      >
+                        <span className={`font-black ${isSizeOutOfStock ? "line-through text-neutral-400" : ""}`}>{sObj.size}</span>
+                        {!isSizeOutOfStock && sObj.quantity > 0 && sObj.quantity < 6 && (
+                          <span className={`text-[10px] font-bold lowercase tracking-wide ${selectedSize === sObj.size ? "text-white/80" : "text-emerald-600"}`}>
+                            {sObj.quantity} {t("products.left") || "left"}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })
+                ) : (
+                  <div className="text-sm text-neutral-400 font-medium italic">Please select a color to see available sizes.</div>
+                )}
               </div>
             </div>
+          ) : (
+            /* Legacy Size Selection */
+            product.sizes && product.sizes.length > 0 && (
+              <div className="mb-8">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-sm font-bold uppercase tracking-widest">{t("products.selectSize")}</span>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                  {product.sizes.map((sObj: any) => {
+                    const size = typeof sObj === 'string' ? sObj : sObj.size;
+                    const qty = typeof sObj === 'object' ? sObj.quantity : null;
+                    const isSizeOutOfStock = qty !== null && qty <= 0;
+                    return (
+                    <button
+                      key={size}
+                      onClick={() => setSelectedSize(size)}
+                      disabled={isSizeOutOfStock}
+                      className={`h-auto min-h-[3rem] py-2 px-4 rounded-xl border-2 uppercase text-sm transition-all flex flex-col items-center justify-center gap-1 ${
+                        isSizeOutOfStock ? "opacity-70 cursor-not-allowed border-neutral-200 bg-neutral-50" :
+                        selectedSize === size 
+                          ? "border-black bg-black text-white" 
+                          : "border-neutral-200 bg-white text-neutral-800 hover:border-black"
+                      }`}
+                    >
+                      <span className={`font-black ${isSizeOutOfStock ? "line-through text-neutral-400" : ""}`}>{size}</span>
+                      {isSizeOutOfStock ? (
+                        <span className="text-[10px] font-bold text-red-500 lowercase tracking-wide">out of stock</span>
+                      ) : qty !== null && qty > 0 ? (
+                        <span className={`text-[10px] font-bold lowercase tracking-wide ${selectedSize === size ? "text-white/80" : "text-emerald-600"}`}>
+                          {qty} {t("products.left") || "left"}
+                        </span>
+                      ) : null}
+                    </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )
           )}
 
           {/* Quantity & Add to Cart */}

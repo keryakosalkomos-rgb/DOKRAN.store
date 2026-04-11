@@ -18,11 +18,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: t("admin.dashboard"), href: "/admin", icon: <LayoutDashboard className="w-5 h-5 shrink-0" /> },
     { name: t("admin.orders"), href: "/admin/orders", icon: <ShoppingCart className="w-5 h-5 shrink-0" /> },
     { name: t("admin.customOrders"), href: "/admin/custom-orders", icon: <Package className="w-5 h-5 shrink-0" /> },
-    { name: t("admin.chats") || "Customer Chats", href: "/admin/chats", icon: <MessageCircle className="w-5 h-5 shrink-0" /> },
+    { name: t("admin.chats"), href: "/admin/chats", icon: <MessageCircle className="w-5 h-5 shrink-0" /> },
     { name: t("admin.products"), href: "/admin/products", icon: <Tags className="w-5 h-5 shrink-0" /> },
     { name: t("admin.categories"), href: "/admin/categories", icon: <LayoutDashboard className="w-5 h-5 shrink-0" /> },
     { name: t("admin.users"), href: "/admin/users", icon: <Users className="w-5 h-5 shrink-0" /> },
-    { name: "Homepage", href: "/admin/homepage", icon: <Globe className="w-5 h-5 shrink-0" /> },
+    { name: t("admin.homepage"), href: "/admin/homepage", icon: <Globe className="w-5 h-5 shrink-0" /> },
+    { name: t("admin.shipping"), href: "/admin/shipping", icon: <ShoppingCart className="w-5 h-5 shrink-0" /> },
     { name: t("admin.settings"), href: "/admin/settings", icon: <Settings className="w-5 h-5 shrink-0" /> },
   ];
 
@@ -61,7 +62,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="px-6 mb-8 text-2xl font-black border-b border-neutral-800 pb-6 tracking-tighter flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Logo isDark className="h-10 w-auto" />
-            <span className="text-sm font-medium text-white/50 border-l border-white/20 pl-3">Admin</span>
+            <span className="text-sm font-medium text-white/50 border-l border-white/20 pl-3">{t("admin.adminTitle")}</span>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-2 hover:bg-neutral-800 rounded-lg">
             <Globe className="w-5 h-5 opacity-40 rotate-45" />
@@ -92,20 +93,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
              className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm text-neutral-500 hover:text-white hover:bg-neutral-900"
            >
              <Globe className="w-5 h-5 shrink-0" />
-             {lang === "en" ? "العربية" : "English"}
+             <span className="font-bold">{lang === "en" ? "AR" : "EN"}</span>
            </button>
            <button 
              onClick={() => signOut({ callbackUrl: "/" })}
              className="flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-bold text-sm text-red-500 hover:bg-red-500/10"
            >
              <LogOut className="w-5 h-5 shrink-0" />
-             {t("nav.signOut") || "Sign Out"}
+             {t("nav.signOut")}
            </button>
            <button 
              onClick={() => setIsSidebarOpen(false)}
              className="lg:hidden w-full py-3 bg-red-600/10 text-red-500 rounded-xl font-bold text-xs"
            >
-             Close Navigation
+             {t("admin.closeNav")}
            </button>
         </div>
       </aside>

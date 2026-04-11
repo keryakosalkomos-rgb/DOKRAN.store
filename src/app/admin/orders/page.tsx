@@ -17,7 +17,7 @@ interface Order {
 }
 
 export default function AdminOrdersPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -122,7 +122,7 @@ export default function AdminOrdersPage() {
                 <th className="p-4 font-medium">{t("admin.orderId")}</th>
                 <th className="p-4 font-medium">{t("admin.date")}</th>
                 <th className="p-4 font-medium">{t("admin.customer")}</th>
-                <th className="p-4 font-medium">{t("admin.shippingFee") || "Shipping"}</th>
+                <th className="p-4 font-medium">{t("admin.shippingFee")}</th>
                 <th className="p-4 font-medium">{t("admin.total")}</th>
                 <th className="p-4 font-medium">{t("admin.payment")}</th>
                 <th className="p-4 font-medium">{t("admin.status")}</th>
@@ -165,10 +165,10 @@ export default function AdminOrdersPage() {
                             rel="noopener noreferrer"
                             className="text-[10px] bg-green-50 text-green-700 px-2 py-0.5 rounded-full border border-green-100 hover:bg-green-100 transition-colors w-fit font-bold flex items-center gap-1"
                           >
-                            <ImageIcon className="w-2 h-2" /> {t("admin.viewProof") || "View Proof"}
+                            <ImageIcon className="w-2 h-2" /> {t("admin.viewProof")}
                           </a>
                         ) : order.paymentMethod !== "Credit/Debit Card" && (
-                          <span className="text-[10px] text-neutral-400 italic">No proof uploaded</span>
+                          <span className="text-[10px] text-neutral-400 italic">{t("admin.noProofUploaded")}</span>
                         )}
                      </div>
                   </td>
@@ -212,24 +212,24 @@ export default function AdminOrdersPage() {
               <X className="w-5 h-5" />
             </button>
             <div className="p-6 overflow-y-auto custom-scrollbar">
-              <h2 className="text-2xl font-bold mb-6">{t("admin.orderDetails") || "Order Details"} - #{selectedOrder._id.slice(-8).toUpperCase()}</h2>
+              <h2 className="text-2xl font-bold mb-6">{t("admin.orderDetails")} - #{selectedOrder._id.slice(-8).toUpperCase()}</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                 <div className="bg-neutral-50 p-4 rounded-xl border border-neutral-100">
-                  <h3 className="font-bold border-b pb-2 mb-3">Customer Information</h3>
-                  <p className="text-sm mb-1"><strong>Name:</strong> {selectedOrder.user?.name || "Unknown"}</p>
-                  <p className="text-sm mb-1"><strong>Email:</strong> {selectedOrder.user?.email || "Unknown"}</p>
-                  <p className="text-sm"><strong>Phone:</strong> {(selectedOrder as any).shippingAddress?.phone || "N/A"}</p>
+                  <h3 className="font-bold border-b pb-2 mb-3">{t("admin.customerInfo")}</h3>
+                  <p className="text-sm mb-1"><strong>{t("admin.name")}:</strong> {selectedOrder.user?.name || t("admin.unknown")}</p>
+                  <p className="text-sm mb-1"><strong>{t("admin.email")}:</strong> {selectedOrder.user?.email || t("admin.unknown")}</p>
+                  <p className="text-sm"><strong>{t("admin.phone")}:</strong> {(selectedOrder as any).shippingAddress?.phone || "N/A"}</p>
                 </div>
                 <div className="bg-neutral-50 p-4 rounded-xl border border-neutral-100">
-                  <h3 className="font-bold border-b pb-2 mb-3">Shipping Address</h3>
+                  <h3 className="font-bold border-b pb-2 mb-3">{t("admin.shippingAddress")}</h3>
                   <p className="text-sm mb-1">{(selectedOrder as any).shippingAddress?.address || "N/A"}</p>
                   <p className="text-sm mb-1">{(selectedOrder as any).shippingAddress?.city || ""}, {(selectedOrder as any).shippingAddress?.country || ""}</p>
                   <p className="text-sm">{(selectedOrder as any).shippingAddress?.postalCode || ""}</p>
                 </div>
               </div>
 
-              <h3 className="font-bold border-b pb-2 mb-3">Order Items</h3>
+              <h3 className="font-bold border-b pb-2 mb-3">{t("admin.orderItems")}</h3>
               <div className="space-y-4 mb-8">
                 {((selectedOrder as any).orderItems || (selectedOrder as any).items || []).map((item: any, idx: number) => (
                   <div key={idx} className="flex items-center gap-4 border border-neutral-100 p-4 rounded-xl hover:bg-neutral-50 transition-colors">
@@ -265,10 +265,10 @@ export default function AdminOrdersPage() {
 
               <div className="flex justify-end">
                 <div className="w-64 space-y-2 text-sm bg-neutral-50 p-4 rounded-xl border border-neutral-100">
-                  <div className="flex justify-between text-neutral-600"><span>Subtotal:</span> <span className="font-semibold text-black">{selectedOrder.itemsPrice?.toFixed(2) || "0.00"} {t("common.currency")}</span></div>
-                  <div className="flex justify-between text-neutral-600"><span>Shipping:</span> <span className="font-semibold text-black">{selectedOrder.shippingPrice?.toFixed(2) || "0.00"} {t("common.currency")}</span></div>
+                  <div className="flex justify-between text-neutral-600"><span>{t("cart.subtotal")}:</span> <span className="font-semibold text-black">{selectedOrder.itemsPrice?.toFixed(2) || "0.00"} {t("common.currency")}</span></div>
+                  <div className="flex justify-between text-neutral-600"><span>{t("admin.shippingFee")}:</span> <span className="font-semibold text-black">{selectedOrder.shippingPrice?.toFixed(2) || "0.00"} {t("common.currency")}</span></div>
                   <div className="border-t pt-2 flex justify-between text-lg mt-2">
-                    <span className="font-bold">Total:</span> 
+                    <span className="font-bold">{t("cart.total")}:</span> 
                     <span className="font-black text-indigo-600">{selectedOrder.totalPrice?.toFixed(2) || "0.00"} {t("common.currency")}</span>
                   </div>
                 </div>

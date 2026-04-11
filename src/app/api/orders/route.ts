@@ -71,18 +71,37 @@ export async function POST(req: Request) {
             const pDoc = await transaction.get(productRef);
             if (pDoc.exists) {
               const pData = pDoc.data();
-              let updateObj: any = { stock: FieldValue.increment(-item.quantity) };
-              if (item.size && pData?.sizes) {
-                const newSizes = pData.sizes.map((sCol: any) => {
-                  const sName = typeof sCol === 'string' ? sCol : sCol.size;
-                  if (sName === item.size && typeof sCol === 'object' && sCol.quantity !== undefined && sCol.quantity !== null) {
-                    return { ...sCol, quantity: sCol.quantity - item.quantity };
+              const updateObj: any = {};
+              
+              // 1. Update Variants Stock
+              if (item.color && item.size && pData?.variants) {
+                const newVariants = pData.variants.map((v: any) => {
+                  if (v.color === item.color) {
+                    const newSizes = v.sizes.map((s: any) => {
+                      if (s.size === item.size) {
+                        return { ...s, quantity: Math.max(0, (s.quantity || 0) - item.quantity) };
+                      }
+                      return s;
+                    });
+                    return { ...v, sizes: newSizes };
                   }
-                  return sCol;
+                  return v;
                 });
-                updateObj.sizes = newSizes;
+                updateObj.variants = newVariants;
+                
+                // Recalculate total stock from new variants
+                const newTotalStock = newVariants.reduce((acc: number, v: any) => 
+                  acc + v.sizes.reduce((sAcc: number, s: any) => sAcc + (Number(s.quantity) || 0), 0), 0
+                );
+                updateObj.stock = newTotalStock;
+              } else if (pData?.stock !== undefined) {
+                // Fallback for products without variants
+                updateObj.stock = FieldValue.increment(-item.quantity);
               }
-              transaction.update(productRef, updateObj);
+              
+              if (Object.keys(updateObj).length > 0) {
+                transaction.update(productRef, updateObj);
+              }
             }
           });
         }

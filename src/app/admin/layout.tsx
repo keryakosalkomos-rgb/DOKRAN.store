@@ -17,7 +17,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const navigation = [
     { name: t("admin.dashboard"), href: "/admin", icon: <LayoutDashboard className="w-5 h-5 shrink-0" /> },
     { name: t("admin.orders"), href: "/admin/orders", icon: <ShoppingCart className="w-5 h-5 shrink-0" /> },
-    { name: t("admin.customOrders"), href: "/admin/custom-orders", icon: <Package className="w-5 h-5 shrink-0" /> },
     { name: t("admin.chats"), href: "/admin/chats", icon: <MessageCircle className="w-5 h-5 shrink-0" /> },
     { name: t("admin.products"), href: "/admin/products", icon: <Tags className="w-5 h-5 shrink-0" /> },
     { name: t("admin.categories"), href: "/admin/categories", icon: <LayoutDashboard className="w-5 h-5 shrink-0" /> },

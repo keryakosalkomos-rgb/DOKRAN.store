@@ -62,52 +62,69 @@ export async function POST(req: Request) {
       console.error("Failed to update user address:", err);
     }
 
-    // Update Product Stock
+    // Update Product Stock & Verify Availability
     try {
       for (const item of orderItems) {
         if (item.product) {
           const productRef = db.collection("products").doc(item.product);
           await db.runTransaction(async (transaction) => {
             const pDoc = await transaction.get(productRef);
-            if (pDoc.exists) {
-              const pData = pDoc.data();
-              const updateObj: any = {};
+            if (!pDoc.exists) throw new Error(`Product not found: ${item.name}`);
+            
+            const pData = pDoc.data();
+            const updateObj: any = {};
+            
+            // 1. Verify and Update Variants Stock
+            if (item.color && item.size && pData?.variants) {
+              const variant = pData.variants.find((v: any) => v.color === item.color);
+              if (!variant) throw new Error(`Color ${item.color} not found for ${item.name}`);
               
-              // 1. Update Variants Stock
-              if (item.color && item.size && pData?.variants) {
-                const newVariants = pData.variants.map((v: any) => {
-                  if (v.color === item.color) {
-                    const newSizes = v.sizes.map((s: any) => {
-                      if (s.size === item.size) {
-                        return { ...s, quantity: Math.max(0, (s.quantity || 0) - item.quantity) };
-                      }
-                      return s;
-                    });
-                    return { ...v, sizes: newSizes };
-                  }
-                  return v;
-                });
-                updateObj.variants = newVariants;
-                
-                // Recalculate total stock from new variants
-                const newTotalStock = newVariants.reduce((acc: number, v: any) => 
-                  acc + v.sizes.reduce((sAcc: number, s: any) => sAcc + (Number(s.quantity) || 0), 0), 0
-                );
-                updateObj.stock = newTotalStock;
-              } else if (pData?.stock !== undefined) {
-                // Fallback for products without variants
-                updateObj.stock = FieldValue.increment(-item.quantity);
-              }
+              const sizeObj = variant.sizes.find((s: any) => s.size === item.size);
+              if (!sizeObj) throw new Error(`Size ${item.size} not found for ${item.name}`);
               
-              if (Object.keys(updateObj).length > 0) {
-                transaction.update(productRef, updateObj);
+              if (sizeObj.quantity < item.quantity) {
+                throw new Error(`Insufficient stock for ${item.name} (${item.color}/${item.size}). Available: ${sizeObj.quantity}`);
               }
+
+              const newVariants = pData.variants.map((v: any) => {
+                if (v.color === item.color) {
+                  const newSizes = v.sizes.map((s: any) => {
+                    if (s.size === item.size) {
+                      return { ...s, quantity: (s.quantity || 0) - item.quantity };
+                    }
+                    return s;
+                  });
+                  return { ...v, sizes: newSizes };
+                }
+                return v;
+              });
+              updateObj.variants = newVariants;
+              
+              const newTotalStock = newVariants.reduce((acc: number, v: any) => 
+                acc + v.sizes.reduce((sAcc: number, s: any) => sAcc + (Number(s.quantity) || 0), 0), 0
+              );
+              updateObj.stock = newTotalStock;
+            } else if (pData?.stock !== undefined) {
+              // Fallback for products without variants
+              if (pData.stock < item.quantity) {
+                throw new Error(`Insufficient stock for ${item.name}. Available: ${pData.stock}`);
+              }
+              updateObj.stock = FieldValue.increment(-item.quantity);
+            }
+            
+            if (Object.keys(updateObj).length > 0) {
+              transaction.update(productRef, updateObj);
             }
           });
         }
       }
-    } catch (err) {
-      console.error("Failed to decrement stock:", err);
+    } catch (err: any) {
+      console.error("Stock verification failed:", err);
+      // Delete the order if stock update failed (since we already added it)
+      // Note: Ideally the order creation should also be inside the same transaction
+      // but firestore transactions have limits. For now, we return error.
+      await db.collection("orders").doc(docRef.id).delete();
+      return NextResponse.json({ message: err.message || "Insufficient stock" }, { status: 400 });
     }
 
     // Insert Admin In-App Notification

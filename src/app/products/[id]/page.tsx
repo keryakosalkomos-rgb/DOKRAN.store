@@ -28,6 +28,17 @@ export default function ProductDetailsPage() {
 
   const addItem = useCartStore((state) => state.addItem);
 
+  // Stock calculation moved to top level to avoid hook ordering errors
+  const currentVariant = product?.variants?.find((v: any) => v.color === selectedColor);
+  const sizeObj = currentVariant?.sizes.find((s: any) => s.size === selectedSize);
+  const maxAvailableStock = sizeObj ? sizeObj.quantity : (product?.variants && product?.variants.length > 0 ? 0 : (product?.stock || 0));
+
+  useEffect(() => {
+    if (product && quantity > maxAvailableStock) {
+      setQuantity(Math.max(1, maxAvailableStock));
+    }
+  }, [selectedSize, selectedColor, maxAvailableStock, product, quantity]);
+
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -92,16 +103,21 @@ export default function ProductDetailsPage() {
     }
     setError(null);
 
+    const currentVariant = product.variants?.find((v: any) => v.color === selectedColor);
+    const sizeObj = currentVariant?.sizes.find((s: any) => s.size === selectedSize);
+    const maxAvailableStock = sizeObj ? sizeObj.quantity : (product.variants && product.variants.length > 0 ? 0 : product.stock);
+
     setIsAdding(true);
     addItem({
       product: product._id,
       name: product.name,
       price: product.price,
-      quantity: quantity,
+      quantity: Math.min(quantity, maxAvailableStock),
       image: product.images?.[0],
       size: selectedSize || undefined,
       color: selectedColor || undefined,
-    });
+      maxStock: maxAvailableStock,
+    }, maxAvailableStock);
 
     setTimeout(() => {
       setIsAdding(false);
@@ -129,7 +145,7 @@ export default function ProductDetailsPage() {
     );
   }
 
-  const isOutOfStock = product.stock <= 0;
+  const isOutOfStock = product?.stock <= 0;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 py-8 md:py-12">
@@ -372,9 +388,9 @@ export default function ProductDetailsPage() {
               </button>
               <span className="font-bold text-lg w-8 text-center">{quantity}</span>
               <button 
-                onClick={() => setQuantity(quantity + 1)}
-                className="text-neutral-400 hover:text-black transition-colors"
-                disabled={isOutOfStock}
+                onClick={() => setQuantity(Math.min(maxAvailableStock, quantity + 1))}
+                className={`transition-colors ${quantity >= maxAvailableStock ? "text-neutral-200 cursor-not-allowed" : "text-neutral-400 hover:text-black"}`}
+                disabled={isOutOfStock || quantity >= maxAvailableStock}
               >
                 <Plus className="w-4 h-4" />
               </button>

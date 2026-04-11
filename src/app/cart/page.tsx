@@ -39,15 +39,17 @@ export default function CartPage() {
                   <div className="flex items-center gap-4 mt-3">
                     <div className="flex items-center border rounded-md">
                       <button 
-                        onClick={() => updateQuantity(item.product, item.quantity - 1, item.size, item.color)}
+                        onClick={() => updateQuantity(item.product, item.quantity - 1, item.size, item.color, item.maxStock)}
                         className="p-1 hover:bg-neutral-100 text-neutral-600"
+                        disabled={item.quantity <= 1}
                       >
                         <Minus className="w-4 h-4" />
                       </button>
                       <span className="px-3 py-1 text-sm font-medium">{item.quantity}</span>
                       <button 
-                        onClick={() => updateQuantity(item.product, item.quantity + 1, item.size, item.color)}
-                        className="p-1 hover:bg-neutral-100 text-neutral-600"
+                        onClick={() => updateQuantity(item.product, item.quantity + 1, item.size, item.color, item.maxStock)}
+                        className={`p-1 transition-colors ${item.maxStock && item.quantity >= item.maxStock ? "text-neutral-200 cursor-not-allowed" : "hover:bg-neutral-100 text-neutral-600"}`}
+                        disabled={item.maxStock !== undefined && item.quantity >= item.maxStock}
                       >
                         <Plus className="w-4 h-4" />
                       </button>

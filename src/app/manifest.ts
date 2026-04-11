@@ -2,9 +2,9 @@ import { MetadataRoute } from 'next';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'DOK-RAN Fashion',
+    name: 'DOK-RAN Wears',
     short_name: 'DOK-RAN',
-    description: 'Premium quality fashion delivered globally. Design your own bespoke garments with AI.',
+    description: 'Premium quality fashion delivered globally. Modern street wear and essentials.',
     start_url: '/',
     display: 'standalone',
     background_color: '#000000',

@@ -289,20 +289,45 @@ export default function CheckoutPage() {
 
             <div className="pt-6 border-t">
               <h3 className="text-lg font-bold mb-4">{t("checkout.payment")}</h3>
-              <div className="space-y-3">
-                {["InstaPay", "Mobile Wallet", "Bank Transfer", "Credit/Debit Card", "Cash on Delivery"].map((method) => (
-                  <label key={method} className="flex items-center space-x-3 border p-4 rounded-lg cursor-pointer hover:bg-neutral-50 transition-colors">
-                    <input 
-                      type="radio" 
-                      name="paymentMethod" 
-                      value={method} 
-                      checked={formData.paymentMethod === method}
-                      onChange={handleChange}
-                      className="w-4 h-4 text-black focus:ring-black" 
-                    />
-                    <span className="font-medium text-sm">
-                      {method === "InstaPay" ? "InstaPay" : method === "Mobile Wallet" ? "Mobile Wallet" : method === "Bank Transfer" ? "Bank Transfer" : method === "Cash on Delivery" ? (t("checkout.cod") || "Cash on Delivery") : "Credit/Debit Card"}
-                    </span>
+              <div className="space-y-4">
+                {[
+                  { name: "InstaPay", logos: ["/images/payments/instapay.png"] },
+                  { name: "Mobile Wallet", logos: ["/images/payments/vodafone.png"] },
+                  { name: "Bank Transfer", logos: [] },
+                  { name: "Credit/Debit Card", logos: ["/images/payments/visa.png", "/images/payments/mastercard.png"] },
+                  { name: "Cash on Delivery", logos: ["/images/payments/cod.png"] }
+                ].map((item) => (
+                  <label key={item.name} className={`flex items-center justify-between border p-4 rounded-xl cursor-pointer hover:bg-neutral-50 transition-all ${formData.paymentMethod === item.name ? "border-black bg-neutral-50 ring-1 ring-black" : "border-neutral-200"}`}>
+                    <div className="flex items-center space-x-3">
+                      <input 
+                        type="radio" 
+                        name="paymentMethod" 
+                        value={item.name} 
+                        checked={formData.paymentMethod === item.name}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-black focus:ring-black accent-black" 
+                      />
+                      <span className="font-bold text-sm">
+                        {item.name === "InstaPay" ? "InstaPay" : 
+                         item.name === "Mobile Wallet" ? "Mobile Wallet" : 
+                         item.name === "Bank Transfer" ? "Bank Transfer" : 
+                         item.name === "Cash on Delivery" ? (t("checkout.cod") || "Cash on Delivery") : 
+                         "Credit/Debit Card"}
+                      </span>
+                    </div>
+                    {item.logos.length > 0 && (
+                      <div className="flex -space-x-2 overflow-hidden">
+                        {item.logos.map((logo, idx) => (
+                          <img 
+                            key={idx} 
+                            src={logo} 
+                            alt="" 
+                            className="w-8 h-8 rounded-full border-2 border-white object-contain bg-white shadow-sm" 
+                            onError={(e) => (e.currentTarget.style.display = 'none')}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </label>
                 ))}
               </div>

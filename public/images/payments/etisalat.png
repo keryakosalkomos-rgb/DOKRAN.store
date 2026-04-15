@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html>
+
+<!--[if lt IE 7]>
+<html class="no-js lt-ie9 lt-ie8 lt-ie7">
+
+<![endif]--><!--[if IE 7]>
+<html class="no-js lt-ie9 lt-ie8">
+
+<![endif]--><!--[if IE 8]>
+<html class="no-js lt-ie9">
+
+<![endif]-->
+
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+<meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+<title>Etisalat</title>
+<meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+<link href="http://www.etisalat.eg/StaticFiles/css/styles.min.css" rel="stylesheet">
+<!--[if IE 8]>
+<link href="http://www.etisalat.eg/StaticFiles/css/ie8.css" rel="stylesheet">
+<![endif]--><!--[if IE 9]>
+<link href="http://www.etisalat.eg/StaticFiles/css/ie9.min.css" rel="stylesheet">
+<![endif]-->
+<link href="http://www.etisalat.eg/StaticFiles/css/custom.css" rel="stylesheet">
+<script src="http://www.etisalat.eg/StaticFiles/js/modernizr.min.js"></script>
+<!--New Nav Files-->
+<link href="http://www.etisalat.eg/StaticFiles/css/darkTheme.css" rel="stylesheet">
+<!--.............-->
+<!--New faceleft Files-->
+<link href="http://www.etisalat.eg/StaticFiles/css/animate.css" rel="stylesheet">
+<!-- New faceleft Files end-->
+<link href="http://www.etisalat.eg/StaticFiles/favicon.ico" rel="shortcut icon" />
+<!-- paging for mobile -->
+<link href="http://www.etisalat.eg/StaticFiles/js/owlcarousel/owl.carousel.css" rel="stylesheet">
+<!-- paging for mobile end-->
+<!-- for demo load only it should be on bottom before body end -->
+<script src="http://www.etisalat.eg/StaticFiles/js/scripts.min.js"></script>
+<script>
+            Etisalat.images = {
+                "Banner_1_480": "http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398324271947&amp;ssbinary=true",
+                "Banner_1_1024": "http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398324271946&amp;ssbinary=true",
+                "Banner_1_1280": "http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398324271948&amp;ssbinary=tru",
+        
+                "Banner_2_480": "http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398324271947&amp;ssbinary=true",
+                "Banner_2_1024": "http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398324271947&amp;ssbinary=true",
+                "Banner_2_1280": "http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398324271947&amp;ssbinary=true",
+        
+                "Banner_3_480": "http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398324271947&amp;ssbinary=true",
+                "Banner_3_1024": "http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398324271947&amp;ssbinary=true",
+                "Banner_3_1280": "http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398324271947&amp;ssbinary=true",
+};
+</script>
+<!-- for demo load only it should be on bottom before body end -->
+</head>
+
+<body class="ltr darkTheme">
+
+<p class="chromeframe">You are using an <strong>outdated</strong> browser. Please
+<a href="http://browsehappy.com/">upgrade your browser</a></p>
+<!-- HEADER -->
+<div class="bg-color dark-grey green clearfix">
+	<div class="wrapper">
+		<div class="top-bar">
+			<a class="logo" href="#"></a><a class="name" href="#">My Etisalat (Account)
+			</a>
+			<div class="language">
+				<a class="" href="home.html" title="">عربى</a> </div>
+			<div class="chatIcon">
+				<a href="#"><span class="icon-chat"></span></a></div>
+			<div class="tabs-bar">
+				<ul>
+					<li>Personal</li>
+					<li class="active"><a href="#">Business</a></li>
+				</ul>
+			</div>
+			<div class="responsive r320 r480 r640">
+				<div class="menu-item">
+					<span class="icon-lock icon-user" title="My Account"></span>
+				</div>
+				<div class="menu-item">
+					<span class="icon-my_account cart-icon" title="Cart Menu">
+					</span></div>
+				<div class="menu-item">
+					<a id="nav_button" class="icon-navmobile" href="#x" title="Menu">
+					</a></div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="bg-color white header clearfix visible">
+	<div class="wrapper">
+		<div class="header">
+			<!--logo--><a class="logo" href="#"></a>
+			<!--logo-->
+			<!-- Main Menu Start -->
+			<div id="nav-hidden_content">
+				<div>
+					<div class="search-form">
+						<form>
+							<input placeholder="Search" type="text" value="Search" />
+							<button type="submit" value="">
+							<span class="icon-search"></span></button>
+						</form>
+					</div>
+					<nav>
+						<ul id="dropline">
+							<li><a class="down" href="#x" tabindex="1">Plans and 
+							Services</a>
+							<ul>
+								<li><a class="down" href="#x" tabindex="1">Internet</a>
+								<ul>
+									<li class="menu-icon internet"></li>
+									<li><a href="#">Internet ADSL</a></li>
+									<li><a href="#">Data Line</a></li>
+									<li><a href="#">Mobile Internet</a></li>
+									<li><a href="#">WiFi Hotspot</a></li>
+									<li><a href="#">BlackBerry® Services</a></li>
+									<li><a href="#">Promotions</a></li>
+									<li><a href="#">Promotions</a></li>
+									<li><a href="#">Promotions</a></li>
+									<li><a href="#">Promotions</a></li>
+									<li><a href="#">Promotions</a></li>
+									<li><a href="#">Promotions</a></li>
+								</ul>
+								</li>
+								<li><a class="down" href="#x" tabindex="1">Voice 
+								Prepaid</a>
+								<ul>
+									<li class="menu-icon VoicePrepaid"></li>
+									<li><a href="#">Freehat Tariff</a></li>
+									<li><a href="#">Ahlan</a></li>
+									<li><a href="#">Choose your gift program</a></li>
+								</ul>
+								</li>
+								<li><a class="down" href="#x" tabindex="1">Voice 
+								Postpaid</a>
+								<ul>
+									<li class="menu-icon VoicePostpaid"></li>
+									<li><a href="#">My Life</a></li>
+									<li><a href="#">My Line</a></li>
+								</ul>
+								</li>
+								<li><a class="down" href="#x" tabindex="1">Hekaya 
+								Plans</a>
+								<ul>
+									<li class="menu-icon HekayaPlans"></li>
+									<li><a href="#">Hekaya</a></li>
+								</ul>
+								</li>
+								<li><a class="down" href="#x" tabindex="1">International &amp; 
+								Roaming</a>
+								<ul>
+									<li class="menu-icon International"></li>
+									<li><a href="#">Traveling to Egypt</a></li>
+									<li><a href="#">Travelling Abroad</a></li>
+									<li><a href="#">International calls</a></li>
+									<li><a href="#">Promotions</a></li>
+								</ul>
+								</li>
+								<li><a class="down" href="#x" tabindex="1">Services</a>
+								<ul>
+									<li class="menu-icon Services"></li>
+									<li><a href="#">Subscribe and Win</a></li>
+									<li><a href="#">Cinema Service</a></li>
+									<li><a href="#">Tracking Services</a></li>
+									<li><a href="#">Out of credit (3al nota)</a></li>
+									<li><a href="#">Promotions</a></li>
+									<li><a href="#">Other Services</a></li>
+								</ul>
+								</li>
+							</ul>
+							</li>
+							<li><a class="down" href="#x" tabindex="1">Shop</a>
+							<ul>
+								<li><a href="#">Shop Now</a></li>
+								<li><a class="down" href="#x" tabindex="1">Devices</a>
+								<ul>
+									<li class="menu-icon Devices"></li>
+									<li><a href="#">Handsets</a></li>
+									<li><a href="#">Tablets</a></li>
+								</ul>
+								</li>
+								<li><a href="#">Internet</a></li>
+								<li><a class="down" href="#x" tabindex="1">Accessories</a>
+								<ul>
+									<li class="menu-icon Accessories"></li>
+									<li><a href="#">Data keys</a></li>
+									<li><a href="#">Cover &amp; screen protectors</a></li>
+									<li><a href="#">Speaker</a></li>
+									<li><a href="#">Headest</a></li>
+									<li><a href="#">Power</a></li>
+								</ul>
+								</li>
+								<li><a href="#">E-cloud</a></li>
+							</ul>
+							</li>
+							<li><a class="down" href="#x">Help</a>
+							<ul>
+								<li><a href="#">Help A</a></li>
+								<li><a href="#">Help B</a></li>
+								<li><a href="#">Help C</a></li>
+								<li><a href="#">Help D</a></li>
+								<li><a href="#">Help E</a></li>
+							</ul>
+							</li>
+						</ul>
+					</nav>
+				</div>
+				<ul class="extra-menu">
+					<li><a href="#">Switch To Business</a></li>
+					<li><a href="home.html">غير اللغه للعربيه</a></li>
+				</ul>
+			</div>
+			<!-- Main Menu End --><a class="name" href="#x">My Etisalat (Account)
+			</a><span class="cart image-button icon-my_account"></span>
+			<div class="language_small-header">
+				<a class="" href="" title="">عربى</a> </div>
+			<div class="search-form">
+				<form>
+					<input placeholder="Search" type="text" value="Search" />
+					<button type="submit" value=""><span class="icon-search">
+					</span></button>
+				</form>
+			</div>
+	
+			<div class="my-account">
+				<!-- My account Menu Start -->
+				<div class="menu">
+					<div class="beforeLoginClass">
+						<p><a href="https://www.etisalat.eg/ecare">Register for 
+						Personal</a>
+						<a href="https://www.etisalat.eg/ecare/faces/oracle/webcenter/portalapp/pages/ISP/Registeration.jspx?locale=en">
+						Register for Business</a> </p>
+						<p>Already a customer?</p>
+						<span>Please Sign In</span>
+						<ul>
+							<li id="loginBtn" class="with-button loginBtnClass">
+							<a class="image-button"  href="https://www.etisalat.eg/ecare">
+							Login</a></li>
+							<li class="with-button">
+							<a class="image-button"  href="http://my.etisalat.eg/">
+							Mobile Internet Usage </a></li>
+						</ul>
+						<a href="https://www.etisalat.eg/ecare/faces/oracle/webcenter/portalapp/pages/Account/ForgetPassword.jspx?locale=en" title="">
+						<span >Forget Your Password</span></a>
+					</div>
+				</div>
+				<!-- My account Menu End -->
+				<!-- Shop Menu Start -->
+				<!-- Shop Menu End --></div>
+		</div>
+	</div>
+</div>
+<!-- END HEADER -->
+<!-- CAROUSEL -->
+<div class="slider-block clearfix">
+	<div class="flexslider">
+		<ul class="slides">
+			<li><a href="#" title="">
+			<img alt="banner1" src="http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398324271947&amp;ssbinary=true" /></a>
+			</li>
+			<li><a href="#" title="">
+			<img alt="banner2" src="http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398170715727&amp;ssbinary=true" /></a>
+			</li>
+			<li><a href="#" title="">
+			<img alt="banner3" src="http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398307699608&amp;ssbinary=true" /></a>
+			</li>
+		</ul>
+	</div>
+</div>
+<!-- END CAROUSEL -->
+<!-- quick links -->
+<div class="bg-color white clearfix">
+	<div class="wrapper">
+		<div class="quickLinks animation-element">
+			<ul>
+				<li>
+				<a href="http://www.etisalat.eg/etisalat/portal/billandrecharge_en">
+				<span class="icon-bill"></span><b>Bill &amp; Recharge</b> <span>
+				Pay you bill easily rechage in secounds</span> </a></li>
+				<li><a href="http://my.etisalat.eg"><span class="icon-usage">
+				</span><b>Mobile Internet Usage</b> <span>Test your rediness to 
+				4G and get started</span> </a></li>
+				<li>
+				<a href="http://www.etisalat.eg/etisalat/portal/internet_adsl_en">
+				<span class="icon-adsl"></span><b>Get ADSL</b> <span>Test your rediness 
+				to 4G and get started</span> </a></li>
+				<li>
+				<a href="http://www.etisalat.eg/eshop/dialreservation/dialReservation.jsp?locale=en_US">
+				<span class="icon-listNumbers"></span><b>Choose a number</b>
+				<span>where ever you are, we are always with you </span></a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
+<!-- quick links end -->
+<!-- our platforms -->
+<div class="bg-color  clearfix">
+	<div class="wrapper">
+		<div class="Our-Platforms">
+			<h1>View Our Platforms</h1>
+			<p>Browse our Latest promos and subscribe now </p>
+			<ul class="owl-carousel owl-theme">
+				<li>
+				<img alt="emerald" src="http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398307699294&amp;ssbinary=true">
+				<p>
+				<a href="http://www.etisalat.eg/etisalat/portal/emerald_page">
+				<b>Emerald</b> <span>Go ahead with the best price </span>
+				<span class="icon-arrow_right"></span></a></p>
+				</li>
+				<li>
+				<img alt="emerald" src="http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398324766694&amp;ssbinary=true">
+				<p>
+				<a href="http://www.etisalat.eg/etisalat/portal/hekaya_plans_en">
+				<b>Hekaya</b> <span>Go ahead with the best price </span>
+				<span class="icon-arrow_right"></span></a></p>
+				</li>
+				<li>
+				<img alt="emerald" src="http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398309684496&amp;ssbinary=true">
+				<p>
+				<a href="http://www.etisalat.eg/etisalat/portal/demagh_tanya_en">
+				<b>Demagh Tanya</b> <span>Go ahead with the best price </span>
+				<span class="icon-arrow_right"></span></a></p>
+				</li>
+				<li>
+				<img alt="emerald" src="http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398307699131&amp;ssbinary=true">
+				<p>
+				<a href="http://www.etisalat.eg/etisalat/portal/voiceprepaid_en">
+				<b>Akwa Kart </b><span>Go ahead with the best price </span>
+				<span class="icon-arrow_right"></span></a></p>
+				</li>
+				<li>
+				<img alt="emerald" src="http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398307699273&amp;ssbinary=true">
+				<p>
+				<a href="http://www.etisalat.eg/etisalat/portal/011_0ffers_en">
+				<b>*011#</b> <span>Go ahead with the best price </span>
+				<span class="icon-arrow_right"></span></a></p>
+				</li>
+				<li>
+				<img alt="emerald" src="http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398307699463&amp;ssbinary=true">
+				<p><a href="http://www.etisalat.eg/etisalat/portal/connectx_en">
+				<b>Connect X</b> <span>Go ahead with the best price </span>
+				<span class="icon-arrow_right"></span></a></p>
+				</li>
+				<li>
+				<img alt="emerald" src="http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398307699442&amp;ssbinary=true">
+				<p>
+				<a href="http://www.etisalat.eg/etisalat/portal/ashal_nezam_en">
+				<b>As-hal Nezam</b> <span>Go ahead with the best price </span>
+				<span class="icon-arrow_right"></span></a></p>
+				</li>
+				<li>
+				<img alt="emerald" src="http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398307699433&amp;ssbinary=true">
+				<p>
+				<a href="http://www.etisalat.eg/etisalat/portal/entertainment_corner_en">
+				<b>Entertainment Corner</b> <span>Go ahead with the best price
+				</span><span class="icon-arrow_right"></span></a></p>
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
+<!-- our platforms end -->
+<!-- Offer Banner 1 -->
+<div class="bg-color white clearfix">
+	<div class="wrapper">
+		<div class="offer_banner animation-element">
+			<div class="image">
+				<img alt="offer1" src="http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobheader=image%2Fjpg&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398309626312&amp;ssbinary=true">
+				<div class="cut">
+				</div>
+			</div>
+			<article>
+				<h1>My Etisalat app ready for download</h1>
+				<p>Download My Etisalat and manage your plan and monitor your usage
+				</p>
+				<a class="image-button" href="#">Download app Now</a>
+			</article>
+		</div>
+	</div>
+</div>
+<!-- Offer Banner end -->
+<!-- Offer Banner 2 -->
+<div class="bg-color white clearfix">
+	<div class="wrapper">
+		<div class="offer_banner right animation-element">
+			<div class="image">
+				<img alt="offer1" src="http://www.etisalat.eg/ss/Satellite?blobcol=urldata&amp;blobheader=image%2Fjpg&amp;blobkey=id&amp;blobnocache=true&amp;blobtable=MungoBlobs&amp;blobwhere=1398309626329&amp;ssbinary=true">
+				<div class="cut">
+				</div>
+			</div>
+			<article>
+				<h1>Check our phone collection </h1>
+				<p>choose your unique number and get started just choose your number 
+				and your plan and you are ready to go </p>
+				<a class="image-button" href="http://www.etisalat.eg/eshop/index.jsp?locale=en_US">
+				Go shopping </a>
+			</article>
+		</div>
+	</div>
+</div>
+<!-- Offer Banner end -->
+<!-- FOOTER -->
+<div class="bg-color dark-grey clearfix footer-stripe">
+	<div class="wrapper">
+		<div class="footer">
+			<ul class="clearfix">
+				<li class="float">
+				<p class="footer-subtitle">Etisalat</p>
+				<div class="link-list">
+					<ul>
+						<li><a href="#" title="">About Us</a></li>
+						<li><a href="#" title="">Yellow Pages</a></li>
+						<li><a href="#" title="">Sitemap</a></li>
+						<li><a href="#" title="">Terms &amp; Conditions</a></li>
+						<li><a href="#" title="">Privacy Policy</a></li>
+					</ul>
+				</div>
+				</li>
+				<li class="float">
+				<p class="footer-subtitle">Top from support</p>
+				<div class="link-list">
+					<ul>
+						<li><a href="#" title="">Understand my bill</a></li>
+						<li><a href="#" title="">Top-up credit</a></li>
+						<li><a href="#" title="">Set-up for mobile internet</a></li>
+						<li><a href="#" title="">Calling abroad</a></li>
+						<li><a href="#" title="">Upgrade my plan</a></li>
+						<li><a href="#" title="">Activate sim</a></li>
+					</ul>
+				</div>
+				</li>
+				<li class="float">
+				<p class="footer-subtitle">Follow us on</p>
+				<div class="social-toolbar">
+					<ul class="clearfix">
+						<li class="float"><a href="#" title="">
+						<span class="icon-youtube"></span></a></li>
+						<li class="float"><a href="#" title="">
+						<span class="icon-google"></span></a></li>
+						<li class="float"><a href="#" title="">
+						<span class="icon-twitter"></span></a></li>
+						<li class="float"><a href="#" title="">
+						<span class="icon-facebook"></span></a></li>
+						<li class="float"><a href="#" title="">
+						<span class="icon-linkedin2"></span></a></li>
+						<li class="float"><a href="#" title="">
+						<span class="icon-instagram"></span></a></li>
+					</ul>
+				</div>
+				<p class="footer-subtitle">Download Saytar</p>
+				<div class="link-list">
+					<ul>
+						<li><span class="img_appStore"></span>
+						<span class="img_playStore"></span></li>
+					</ul>
+				</div>
+				</li>
+			</ul>
+			<div class="credits">
+				<p>Copyright 2014 &copy; Etisalat. All Rights Reserved.</p>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- END FOOTER -->
+<script src="http://www.etisalat.eg/StaticFiles/js/darkTheme.js"></script>
+<!-- paging for mobile -->
+<script src="http://www.etisalat.eg/StaticFiles/js/owlcarousel/owl.carousel.js"></script>
+<!-- slider for mobile start-->
+<script>
+$(document).ready(function() {
+if($(window).width() <= 767){ 
+              var owl = $('.Our-Platforms .owl-carousel');
+              owl.owlCarousel({
+                rtl: false,
+                margin: 15,
+                responsive: {
+                  0: {
+                    items: 1,
+                  },
+              	  480: {
+                    items: 2,
+                  },
+                }
+              })
+  }
+ });
+ </script>
+<!-- slider for mobile end-->
+
+</body>
+
+</html>
+

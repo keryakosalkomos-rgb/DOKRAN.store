@@ -320,5 +320,11 @@
   "auth.createAccount": "أنشئ حساباً الآن",
   "auth.joinTitle": "انضم إلى دوك-ران.",
   "auth.joinDesc": "أنشئ حساباً لحفظ تصميماتك المخصصة.",
-  "auth.createBtn": "إنشاء حساب"
+  "auth.createBtn": "إنشاء حساب",
+  "contact.title": "اتصل بنا",
+  "contact.whatsapp": "راسلنا على واتساب",
+  "contact.phone": "اتصل بنا الآن",
+  "contact.facebook": "انضم لمجموعتنا على فيسبوك",
+  "admin.sizeGuides": "دليل المقاسات",
+  "products.sizeGuide": "دليل المقاسات"
 }

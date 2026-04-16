@@ -4,9 +4,10 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useCartStore } from "@/store/useCartStore";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import { ArrowLeft, Check, Minus, Plus, ShoppingBag } from "lucide-react";
+import { ArrowLeft, Check, Minus, Plus, ShoppingBag, Ruler } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
+import SizeGuideModal from "@/components/products/SizeGuideModal";
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
@@ -25,6 +26,7 @@ export default function ProductDetailsPage() {
   const [isAdding, setIsAdding] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
 
   const addItem = useCartStore((state) => state.addItem);
 
@@ -298,7 +300,16 @@ export default function ProductDetailsPage() {
             <div className="mb-8">
               <div className="flex justify-between items-center mb-4">
                 <span className="text-sm font-bold uppercase tracking-widest">{t("products.selectSize")}</span>
-                {!selectedColor && <span className="text-[10px] text-red-500 font-bold uppercase">Select color first</span>}
+                <div className="flex items-center gap-4">
+                  {!selectedColor && <span className="text-[10px] text-red-500 font-bold uppercase">Select color first</span>}
+                  <button 
+                    onClick={() => setIsSizeGuideOpen(true)}
+                    className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-800 transition-colors bg-indigo-50 px-3 py-1.5 rounded-lg"
+                  >
+                    <Ruler className="w-3 h-3" />
+                    {t("products.sizeGuide") || "Size Guide"}
+                  </button>
+                </div>
               </div>
               <div className="flex flex-wrap gap-3">
                 {selectedColor ? (
@@ -336,6 +347,13 @@ export default function ProductDetailsPage() {
               <div className="mb-8">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-sm font-bold uppercase tracking-widest">{t("products.selectSize")}</span>
+                  <button 
+                    onClick={() => setIsSizeGuideOpen(true)}
+                    className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-800 transition-colors bg-indigo-50 px-3 py-1.5 rounded-lg"
+                  >
+                    <Ruler className="w-3 h-3" />
+                    {t("products.sizeGuide") || "Size Guide"}
+                  </button>
                 </div>
                 <div className="flex flex-wrap gap-3">
                   {product.sizes.map((sObj: any) => {
@@ -422,6 +440,8 @@ export default function ProductDetailsPage() {
 
         </div>
       </div>
+
+      <SizeGuideModal isOpen={isSizeGuideOpen} onClose={() => setIsSizeGuideOpen(false)} />
     </div>
   );
 }

@@ -320,5 +320,11 @@
   "auth.createAccount": "Create one now",
   "auth.joinTitle": "Join DOK-RAN.",
   "auth.joinDesc": "Create an account to save your custom designs.",
-  "auth.createBtn": "Create Account"
+  "auth.createBtn": "Create Account",
+  "contact.title": "Contact Us",
+  "contact.whatsapp": "WhatsApp Us",
+  "contact.phone": "Call Us",
+  "contact.facebook": "Join our Facebook Group",
+  "admin.sizeGuides": "Size Guides",
+  "products.sizeGuide": "Size Guide"
 }

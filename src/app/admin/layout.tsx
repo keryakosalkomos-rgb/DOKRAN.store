@@ -20,6 +20,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: t("admin.chats"), href: "/admin/chats", icon: <MessageCircle className="w-5 h-5 shrink-0" /> },
     { name: t("admin.products"), href: "/admin/products", icon: <Tags className="w-5 h-5 shrink-0" /> },
     { name: t("admin.categories"), href: "/admin/categories", icon: <LayoutDashboard className="w-5 h-5 shrink-0" /> },
+    { name: t("admin.sizeGuides"), href: "/admin/size-guides", icon: <Package className="w-5 h-5 shrink-0" /> },
     { name: t("admin.users"), href: "/admin/users", icon: <Users className="w-5 h-5 shrink-0" /> },
     { name: t("admin.homepage"), href: "/admin/homepage", icon: <Globe className="w-5 h-5 shrink-0" /> },
     { name: t("admin.shipping"), href: "/admin/shipping", icon: <ShoppingCart className="w-5 h-5 shrink-0" /> },

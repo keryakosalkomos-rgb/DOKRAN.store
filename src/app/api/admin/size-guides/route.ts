@@ -13,7 +13,7 @@ export async function GET() {
 
     let guides = [];
     if (docSnap.exists) {
-      const dbData = docSnap.data();
+      const dbData = docSnap.data() || {};
       if (dbData.data) {
         try { guides = JSON.parse(dbData.data); } catch(e) {}
       } else {

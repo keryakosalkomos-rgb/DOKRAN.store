@@ -58,7 +58,7 @@ export default function Home() {
     addItem({
       product: product._id,
       name: product.name,
-      price: product.price,
+      price: (product.priceAfterDiscount != null && product.priceAfterDiscount > 0 && product.priceAfterDiscount < product.price) ? product.priceAfterDiscount : product.price,
       quantity: 1,
       image: product.images?.[0] || "https://via.placeholder.com/600",
     });
@@ -142,6 +142,15 @@ export default function Home() {
                     className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
                   />
                   
+                  {/* Discount Badge - Corner Triangle */}
+                  {product.priceAfterDiscount != null && product.priceAfterDiscount > 0 && product.priceAfterDiscount < product.price && (
+                    <div className="absolute top-0 left-0 z-10" style={{ width: 0, height: 0, borderStyle: 'solid', borderWidth: '100px 100px 0 0', borderColor: '#22c55e transparent transparent transparent' }}>
+                      <span className="absolute text-white font-black text-base" style={{ top: '-88px', left: '8px', transform: 'rotate(-45deg)' }}>
+                        -{Math.round(((product.price - product.priceAfterDiscount) / product.price) * 100)}%
+                      </span>
+                    </div>
+                  )}
+                  
                   {/* Desktop: Hover | Mobile: Always visible or better interaction */}
                   <div className="absolute inset-x-0 bottom-0 p-3 opacity-0 group-hover:opacity-100 md:group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-black/60 to-transparent flex justify-center translate-y-2 group-hover:translate-y-0 transition-transform">
                     <button 
@@ -163,9 +172,16 @@ export default function Home() {
                 <div className="flex-1 flex flex-col">
                   <h3 className="text-sm font-bold text-neutral-900 line-clamp-1 mb-1">{product.name}</h3>
                   <div className="flex items-center justify-between mt-auto">
-                    <p className="text-sm text-neutral-500 font-medium decoration-indigo-500/30 group-hover:underline underline-offset-4">
-                      {product.price} {t("common.currency")}
-                    </p>
+                    {product.priceAfterDiscount != null && product.priceAfterDiscount > 0 && product.priceAfterDiscount < product.price ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-neutral-400 line-through">{product.price} {t("common.currency")}</span>
+                        <span className="text-sm text-green-600 font-black">{product.priceAfterDiscount} {t("common.currency")}</span>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-neutral-500 font-medium decoration-indigo-500/30 group-hover:underline underline-offset-4">
+                        {product.price} {t("common.currency")}
+                      </p>
+                    )}
                     {product.stock > 0 && product.stock < 10 ? (
                       <span className="text-[10px] font-bold text-neutral-400 bg-neutral-100 px-2 py-0.5 rounded-full">
                         {product.stock} {t("products.left") || "left"}

@@ -60,6 +60,12 @@ export async function GET(req: Request) {
       products = products.filter((p: any) => allowedCategoryIds.includes(p.category));
     }
 
+    // Filter discounted products only
+    const discountFilter = searchParams.get("discount");
+    if (discountFilter === "true") {
+      products = products.filter((p: any) => p.priceAfterDiscount != null && p.priceAfterDiscount > 0 && p.priceAfterDiscount < p.price);
+    }
+
     // Populate categories
     if (products.length > 0) {
       const allCatIds = [...new Set(products.map((p: any) => p.category))].filter(Boolean);

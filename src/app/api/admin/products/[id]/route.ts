@@ -26,7 +26,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   try {
     const { id } = await params;
     const body = await req.json();
-    const { name, description, price, category, stock, variants, images, isFeatured, serialNumber } = body;
+    const { name, description, price, priceAfterDiscount, category, stock, variants, images, isFeatured, serialNumber } = body;
 
     const updateData: any = {
       name,
@@ -40,6 +40,11 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       serialNumber: serialNumber || "",
       updatedAt: new Date().toISOString()
     };
+    if (priceAfterDiscount !== undefined && priceAfterDiscount !== null && priceAfterDiscount !== "") {
+      updateData.priceAfterDiscount = Number(priceAfterDiscount);
+    } else {
+      updateData.priceAfterDiscount = null;
+    }
 
     // Update slug if name changed
     if (name) {

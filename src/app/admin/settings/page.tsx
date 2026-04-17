@@ -19,6 +19,10 @@ export default function AdminSettingsPage() {
     adminWhatsAppNumber: "",
     whatsAppNotificationsEnabled: false,
     fixedShippingPrice: 0,
+    contactWhatsApp: "",
+    contactPhone: "",
+    contactFacebook: "",
+    contactTikTok: "",
   });
 
   useEffect(() => {
@@ -34,6 +38,10 @@ export default function AdminSettingsPage() {
             adminWhatsAppNumber: data.adminWhatsAppNumber || "",
             whatsAppNotificationsEnabled: !!data.whatsAppNotificationsEnabled,
             fixedShippingPrice: data.fixedShippingPrice || 0,
+            contactWhatsApp: data.contactWhatsApp || "",
+            contactPhone: data.contactPhone || "",
+            contactFacebook: data.contactFacebook || "",
+            contactTikTok: data.contactTikTok || "",
           });
         }
         setLoading(false);
@@ -185,7 +193,31 @@ export default function AdminSettingsPage() {
         </div>
       </div>
 
+      <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-8 mb-8">
+        <h2 className="text-xl font-bold mb-6 flex items-center border-b pb-4">
+          <Settings className="w-5 h-5 mr-3 text-neutral-500" />
+          {t("admin.contactSettings")}
+        </h2>
 
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div>
+            <label className="block text-sm font-medium mb-2">{t("admin.whatsappLink")} / Number</label>
+            <input type="text" name="contactWhatsApp" value={settings.contactWhatsApp} onChange={handleChange} className="w-full border rounded-lg px-4 py-2 bg-neutral-50" placeholder="https://wa.me/..." />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">{t("admin.phoneLink")}</label>
+            <input type="text" name="contactPhone" value={settings.contactPhone} onChange={handleChange} className="w-full border rounded-lg px-4 py-2 bg-neutral-50" placeholder="010..." />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">{t("admin.facebookLink")}</label>
+            <input type="text" name="contactFacebook" value={settings.contactFacebook} onChange={handleChange} className="w-full border rounded-lg px-4 py-2 bg-neutral-50" placeholder="https://facebook.com/..." />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2">{t("admin.tiktokLink")}</label>
+            <input type="text" name="contactTikTok" value={settings.contactTikTok} onChange={handleChange} className="w-full border rounded-lg px-4 py-2 bg-neutral-50" placeholder="https://tiktok.com/..." />
+          </div>
+        </div>
+      </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-neutral-100 p-8 mb-8">
         <h2 className="text-xl font-bold mb-6 flex items-center border-b pb-4">
@@ -213,13 +245,6 @@ export default function AdminSettingsPage() {
                <input type="checkbox" name="isActive" checked={settings.isActive} onChange={handleChange} className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600" />
                <span className="text-sm font-medium">{t("admin.acceptManual")}</span>
             </label>
-          </div>
-          <div className="pt-4 border-t border-neutral-100">
-            <label className="block text-sm font-medium mb-2">{t("admin.fixedShippingPrice")}</label>
-            <div className="relative max-w-xs">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 text-[10px] font-black">{t("common.currency")}</span>
-              <input type="number" name="fixedShippingPrice" value={settings.fixedShippingPrice} onChange={handleChange} className="w-full border rounded-lg pl-12 pr-4 py-2 bg-neutral-50" placeholder="0" min="0" />
-            </div>
           </div>
 
           <div className="flex items-center gap-4">

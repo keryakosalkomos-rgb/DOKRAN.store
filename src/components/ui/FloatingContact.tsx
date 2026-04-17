@@ -3,6 +3,7 @@
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { Phone } from "lucide-react";
 import { motion } from "framer-motion";
+import { formatWaLink, formatPhoneLink, formatSocialLink } from "@/lib/utils";
 
 const WhatsAppIcon = ({ className }: { className?: string }) => (
   <svg 
@@ -24,31 +25,57 @@ const FbContactIcon = ({ className }: { className?: string }) => (
   </svg>
 );
 
-export default function FloatingContact() {
+const TikTokIcon = ({ className }: { className?: string }) => (
+  <svg 
+    viewBox="0 0 24 24" 
+    fill="currentColor" 
+    className={className}
+  >
+    <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.01.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 2.23-.9 4.46-2.43 6.07-1.57 1.63-3.86 2.59-6.14 2.54-2.88-.04-5.63-1.47-7.23-3.82-1.54-2.28-2.02-5.18-1.29-7.85.73-2.6 2.5-4.81 4.88-5.87 2.16-.96 4.67-1.02 6.88-.23v4.11c-1.39-.77-3.13-.86-4.59-.3-1.4.52-2.48 1.68-2.91 3.12-.41 1.34-.18 2.87.64 4.02.83 1.16 2.22 1.83 3.65 1.87 1.7.04 3.4-.66 4.54-1.93 1.16-1.27 1.8-3.03 1.8-4.78.01-6.66.01-13.32.01-19.98.02z" />
+  </svg>
+);
+
+export default function FloatingContact({ links }: { links?: any }) {
   const { t, lang } = useLanguage();
   const isRTL = lang === "ar";
+
+  const defaultLinks = {
+    whatsapp: "https://wa.me/201210275442",
+    phone: "01069478867",
+    facebook: "https://www.facebook.com/share/17Wnvqb4Se/",
+    tiktok: "https://www.tiktok.com/@dokran.wears?_r=1&_t=ZS-95c6O0sdkD2"
+  };
+
+  const activeLinks = links || defaultLinks;
 
   const contacts = [
     {
       id: "whatsapp",
       icon: <WhatsAppIcon className="w-6 h-6" />,
       label: t("contact.whatsapp"),
-      href: "https://wa.me/201210275442",
+      href: formatWaLink(activeLinks.whatsapp),
       color: "bg-[#25D366]",
     },
     {
       id: "phone",
       icon: <Phone className="w-6 h-6" />,
       label: t("contact.phone"),
-      href: "tel:01069478867",
+      href: formatPhoneLink(activeLinks.phone),
       color: "bg-blue-600",
     },
     {
       id: "facebook",
       icon: <FbContactIcon className="w-6 h-6" />,
       label: t("contact.facebook"),
-      href: "https://www.facebook.com/share/17Wnvqb4Se/",
+      href: formatSocialLink(activeLinks.facebook),
       color: "bg-[#1877F2]",
+    },
+    {
+      id: "tiktok",
+      icon: <TikTokIcon className="w-5 h-5" />,
+      label: t("contact.tiktok"),
+      href: formatSocialLink(activeLinks.tiktok),
+      color: "bg-black",
     },
   ];
 

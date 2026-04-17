@@ -20,6 +20,7 @@ export default function Navbar() {
   const { isInstallable, isInstalled, installApp } = usePWA();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [categories, setCategories] = useState<any[]>([]);
+  const [hasDiscounts, setHasDiscounts] = useState(false);
 
   useEffect(() => {
     fetch('/api/categories')
@@ -30,6 +31,15 @@ export default function Navbar() {
         }
       })
       .catch(err => console.error("Error fetching categories:", err));
+    
+    fetch('/api/products?discount=true')
+      .then(res => res.json())
+      .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+          setHasDiscounts(true);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const isRTL = lang === "ar";
@@ -43,6 +53,11 @@ export default function Navbar() {
 
   const navLinks = [
     ...dynamicLinks,
+    ...(hasDiscounts ? [{
+      href: "/products?discount=true",
+      label: t("nav.discounts") || "Discounts",
+      highlight: true
+    }] : []),
   ];
 
   return (

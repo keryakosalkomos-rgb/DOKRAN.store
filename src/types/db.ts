@@ -26,6 +26,7 @@ export interface Product {
   slug: string;
   description: string;
   price: number;
+  priceAfterDiscount?: number | null;
   category: string; // Category ID
   subCategory?: string; // SubCategory ID
   images: string[];

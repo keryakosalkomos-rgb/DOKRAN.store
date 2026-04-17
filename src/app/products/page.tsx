@@ -13,6 +13,7 @@ export default function ProductsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const categoryFilter = searchParams.get("category");
+  const discountFilter = searchParams.get("discount");
   
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -37,7 +38,12 @@ export default function ProductsPage() {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const url = categoryFilter ? `/api/products?category=${categoryFilter}` : "/api/products";
+        let url = "/api/products";
+        if (discountFilter === "true") {
+          url = "/api/products?discount=true";
+        } else if (categoryFilter) {
+          url = `/api/products?category=${categoryFilter}`;
+        }
         const res = await fetch(url);
         if (res.ok) {
           const data = await res.json();
@@ -50,7 +56,7 @@ export default function ProductsPage() {
       }
     };
     fetchProducts();
-  }, [categoryFilter]);
+  }, [categoryFilter, discountFilter]);
 
   const addItem = useCartStore((state) => state.addItem);
 
@@ -66,7 +72,7 @@ export default function ProductsPage() {
     addItem({
       product: product._id,
       name: product.name,
-      price: product.price,
+      price: (product.priceAfterDiscount != null && product.priceAfterDiscount > 0 && product.priceAfterDiscount < product.price) ? product.priceAfterDiscount : product.price,
       quantity: 1,
       image: product.images?.[0] || "https://via.placeholder.com/600",
     });
@@ -92,7 +98,7 @@ export default function ProductsPage() {
       <div className="flex flex-col mb-12">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-baseline mb-8">
           <h1 className="text-3xl md:text-4xl font-black tracking-tight mb-6 md:mb-0">
-            {!categoryFilter ? t("products.allProducts") : activeCategoryDoc?.name || categoryFilter}
+            {discountFilter === "true" ? (t("nav.discounts") || "Discounts") : !categoryFilter ? t("products.allProducts") : activeCategoryDoc?.name || categoryFilter}
           </h1>
           <div className="flex w-full md:w-auto overflow-x-auto no-scrollbar gap-4 text-sm font-medium border-b pb-2">
             <Link href="/products" className={`whitespace-nowrap hover:text-black transition-all ${!categoryFilter ? 'text-black border-b-2 border-black font-bold' : 'text-neutral-400'}`}>{t("products.all")}</Link>
@@ -148,6 +154,15 @@ export default function ProductsPage() {
                   className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700"
                 />
                 
+                {/* Discount Badge - Corner Triangle */}
+                {product.priceAfterDiscount != null && product.priceAfterDiscount > 0 && product.priceAfterDiscount < product.price && (
+                  <div className="absolute top-0 left-0 z-10" style={{ width: 0, height: 0, borderStyle: 'solid', borderWidth: '100px 100px 0 0', borderColor: '#22c55e transparent transparent transparent' }}>
+                    <span className="absolute text-white font-black text-base" style={{ top: '-88px', left: '8px', transform: 'rotate(-45deg)' }}>
+                      -{Math.round(((product.price - product.priceAfterDiscount) / product.price) * 100)}%
+                    </span>
+                  </div>
+                )}
+                
                 {/* Desktop: Hover | Mobile: Always visible or better interaction */}
                 <div className="absolute inset-x-0 bottom-0 p-3 opacity-0 group-hover:opacity-100 md:group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-t from-black/60 to-transparent flex justify-center translate-y-2 group-hover:translate-y-0 transition-transform">
                   <button 
@@ -169,9 +184,16 @@ export default function ProductsPage() {
               <div className="flex-1 flex flex-col">
                 <h3 className="text-sm font-bold text-neutral-900 line-clamp-1 mb-1">{product.name}</h3>
                 <div className="flex items-center justify-between mt-auto">
-                  <p className="text-sm text-neutral-500 font-medium decoration-indigo-500/30 group-hover:underline underline-offset-4">
-                    {product.price.toFixed(2)} {t("common.currency")}
-                  </p>
+                  {product.priceAfterDiscount != null && product.priceAfterDiscount > 0 && product.priceAfterDiscount < product.price ? (
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-neutral-400 line-through">{product.price.toFixed(2)} {t("common.currency")}</span>
+                      <span className="text-sm text-green-600 font-black">{product.priceAfterDiscount.toFixed(2)} {t("common.currency")}</span>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-neutral-500 font-medium decoration-indigo-500/30 group-hover:underline underline-offset-4">
+                      {product.price.toFixed(2)} {t("common.currency")}
+                    </p>
+                  )}
                   {product.stock > 0 && product.stock < 10 ? (
                     <span className="text-[10px] font-bold text-neutral-400 bg-neutral-100 px-2 py-0.5 rounded-full">
                       {product.stock} {t("products.left") || "left"}

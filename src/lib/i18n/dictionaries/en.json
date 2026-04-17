@@ -326,5 +326,16 @@
   "contact.phone": "Call Us",
   "contact.facebook": "Join our Facebook Group",
   "admin.sizeGuides": "Size Guides",
-  "products.sizeGuide": "Size Guide"
+  "products.sizeGuide": "Size Guide",
+  "contact.tiktok": "Follow us on TikTok",
+  "admin.contactSettings": "Contact Links Settings",
+  "admin.whatsappLink": "WhatsApp Link",
+  "admin.facebookLink": "Facebook Link",
+  "admin.phoneLink": "Phone Number",
+  "admin.tiktokLink": "TikTok Link",
+  "admin.setDiscount": "Set Discount on this product",
+  "admin.priceAfterDiscount": "Price After Discount",
+  "admin.discountPercent": "Discount",
+  "nav.discounts": "Discounts",
+  "products.sale": "Sale"
 }

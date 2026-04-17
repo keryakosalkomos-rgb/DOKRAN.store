@@ -13,6 +13,10 @@ export async function GET() {
           { id: "1", title: "Men's Collection", image: "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&q=80&w=800", link: "/products?category=men" },
           { id: "2", title: "Women's Collection", image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=800", link: "/products?category=women" }
         ],
+        contactWhatsApp: "https://wa.me/201210275442",
+        contactPhone: "01069478867",
+        contactFacebook: "https://www.facebook.com/share/17Wnvqb4Se/",
+        contactTikTok: "https://www.tiktok.com/@dokran.wears?_r=1&_t=ZS-95c6O0sdkD2",
       });
     }
 
@@ -23,6 +27,10 @@ export async function GET() {
         { id: "1", title: "Men's Collection", image: "https://images.unsplash.com/photo-1617137968427-85924c800a22?auto=format&fit=crop&q=80&w=800", link: "/products?category=men" },
         { id: "2", title: "Women's Collection", image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=800", link: "/products?category=women" }
       ],
+      contactWhatsApp: data.contactWhatsApp || "https://wa.me/201210275442",
+      contactPhone: data.contactPhone || "01069478867",
+      contactFacebook: data.contactFacebook || "https://www.facebook.com/share/17Wnvqb4Se/",
+      contactTikTok: data.contactTikTok || "https://www.tiktok.com/@dokran.wears?_r=1&_t=ZS-95c6O0sdkD2",
     });
   } catch (error) {
     return NextResponse.json({ error: "Server error" }, { status: 500 });

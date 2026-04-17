@@ -41,14 +41,14 @@ export async function POST(request: Request) {
   }
   try {
     const body = await request.json();
-    const { name, description, price, category, stock, variants, images, isFeatured, serialNumber } = body;
+    const { name, description, price, priceAfterDiscount, category, stock, variants, images, isFeatured, serialNumber } = body;
     if (!name || !description || !price || !category) {
       return NextResponse.json({ error: "Name, description, price and category are required" }, { status: 400 });
     }
     const slug = name.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]+/g, "") + "-" + Date.now();
     
     const db = adminDb();
-    const newProduct = {
+    const newProduct: any = {
       name,
       slug,
       description,
@@ -62,6 +62,11 @@ export async function POST(request: Request) {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };
+    if (priceAfterDiscount !== undefined && priceAfterDiscount !== null && priceAfterDiscount !== "") {
+      newProduct.priceAfterDiscount = Number(priceAfterDiscount);
+    } else {
+      newProduct.priceAfterDiscount = null;
+    }
     
     const docRef = await db.collection("products").add(newProduct);
     

@@ -110,10 +110,11 @@ export default function ProductDetailsPage() {
     const maxAvailableStock = sizeObj ? sizeObj.quantity : (product.variants && product.variants.length > 0 ? 0 : product.stock);
 
     setIsAdding(true);
+    const effectivePrice = (product.priceAfterDiscount != null && product.priceAfterDiscount > 0 && product.priceAfterDiscount < product.price) ? product.priceAfterDiscount : product.price;
     addItem({
       product: product._id,
       name: product.name,
-      price: product.price,
+      price: effectivePrice,
       quantity: Math.min(quantity, maxAvailableStock),
       image: product.images?.[0],
       size: selectedSize || undefined,
@@ -168,7 +169,15 @@ export default function ProductDetailsPage() {
               alt={product.name}
               className="w-full h-full object-cover"
             />
-            {product.isFeatured && (
+            {/* Discount Badge - Corner Triangle */}
+            {product.priceAfterDiscount != null && product.priceAfterDiscount > 0 && product.priceAfterDiscount < product.price && (
+              <div className="absolute top-0 left-0 z-20" style={{ width: 0, height: 0, borderStyle: 'solid', borderWidth: '120px 120px 0 0', borderColor: '#22c55e transparent transparent transparent' }}>
+                <span className="absolute text-white font-black text-xl" style={{ top: '-105px', left: '10px', transform: 'rotate(-45deg)' }}>
+                  -{Math.round(((product.price - product.priceAfterDiscount) / product.price) * 100)}%
+                </span>
+              </div>
+            )}
+            {product.isFeatured && !(product.priceAfterDiscount != null && product.priceAfterDiscount > 0 && product.priceAfterDiscount < product.price) && (
               <span className="absolute top-4 left-4 bg-black text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">
                 HOT
               </span>
@@ -207,9 +216,23 @@ export default function ProductDetailsPage() {
           </div>
           <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-4">{product.name}</h1>
           <div className="flex items-center gap-4 mb-8">
-            <p className="text-2xl font-bold text-neutral-800 decoration-indigo-500/30 underline underline-offset-8">
-              {product.price} {t("common.currency")}
-            </p>
+            {product.priceAfterDiscount != null && product.priceAfterDiscount > 0 && product.priceAfterDiscount < product.price ? (
+              <>
+                <p className="text-xl text-neutral-400 line-through font-medium">
+                  {product.price} {t("common.currency")}
+                </p>
+                <p className="text-2xl font-black text-green-600">
+                  {product.priceAfterDiscount} {t("common.currency")}
+                </p>
+                <span className="bg-green-100 text-green-700 text-xs font-black px-3 py-1.5 rounded-full">
+                  -{Math.round(((product.price - product.priceAfterDiscount) / product.price) * 100)}%
+                </span>
+              </>
+            ) : (
+              <p className="text-2xl font-bold text-neutral-800 decoration-indigo-500/30 underline underline-offset-8">
+                {product.price} {t("common.currency")}
+              </p>
+            )}
             {product.stock > 0 && product.stock < 10 && (
               <span className="bg-neutral-100 text-neutral-600 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>

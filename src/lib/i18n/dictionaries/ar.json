@@ -326,5 +326,16 @@
   "contact.phone": "اتصل بنا الآن",
   "contact.facebook": "انضم لمجموعتنا على فيسبوك",
   "admin.sizeGuides": "دليل المقاسات",
-  "products.sizeGuide": "دليل المقاسات"
+  "products.sizeGuide": "دليل المقاسات",
+  "contact.tiktok": "تابعنا على تيك توك",
+  "admin.contactSettings": "إعدادات روابط التواصل",
+  "admin.whatsappLink": "رابط واتساب",
+  "admin.facebookLink": "رابط فيسبوك",
+  "admin.phoneLink": "رقم الهاتف للاستعلامات",
+  "admin.tiktokLink": "رابط تيك توك",
+  "admin.setDiscount": "تفعيل خصم على هذا المنتج",
+  "admin.priceAfterDiscount": "السعر بعد الخصم",
+  "admin.discountPercent": "نسبة الخصم",
+  "nav.discounts": "خصومات",
+  "products.sale": "تخفيض"
 }

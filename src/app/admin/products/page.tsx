@@ -7,7 +7,7 @@ import { useLanguage } from "@/lib/i18n/LanguageContext";
 
 interface Category { _id: string; name: string; parent?: { _id: string } | string | null; }
 interface Product {
-  _id: string; name: string; slug: string; price: number; stock: number;
+  _id: string; name: string; slug: string; price: number; priceAfterDiscount?: number | null; stock: number;
   images: string[]; category?: { _id?: string; name: string }; isFeatured: boolean;
 }
 
@@ -34,6 +34,8 @@ export default function AdminProductsPage() {
   const [sizeQuantity, setSizeQuantity] = useState("0");
   const [images, setImages] = useState<string[]>([]);
   const [isFeatured, setIsFeatured] = useState(false);
+  const [hasDiscount, setHasDiscount] = useState(false);
+  const [priceAfterDiscount, setPriceAfterDiscount] = useState("");
 
   useEffect(() => { fetchData(); }, []);
 
@@ -90,6 +92,7 @@ export default function AdminProductsPage() {
   const resetForm = () => {
     setName(""); setDescription(""); setPrice(""); setStock("0"); setSerialNumber(""); setMainCategoryId(""); setSubCategoryId("");
     setVariants([]); setSizeInput(""); setSizeQuantity("0"); setImages([]); setIsFeatured(false);
+    setHasDiscount(false); setPriceAfterDiscount("");
     setCurrentVariantColor("#000000"); setError(""); setEditingId(null);
   };
 
@@ -110,6 +113,7 @@ export default function AdminProductsPage() {
         name, 
         description, 
         price, 
+        priceAfterDiscount: hasDiscount && priceAfterDiscount ? priceAfterDiscount : null,
         stock: totalStock, 
         category: finalCategoryId, 
         variants, 
@@ -143,6 +147,14 @@ export default function AdminProductsPage() {
     setVariants((product as any).variants || []);
     setImages(product.images || []);
     setIsFeatured(product.isFeatured);
+    const discountVal = (product as any).priceAfterDiscount;
+    if (discountVal != null && discountVal > 0) {
+      setHasDiscount(true);
+      setPriceAfterDiscount(discountVal.toString());
+    } else {
+      setHasDiscount(false);
+      setPriceAfterDiscount("");
+    }
     setShowForm(true);
   };
 
@@ -185,6 +197,24 @@ export default function AdminProductsPage() {
                   <label className="block text-sm font-semibold mb-1">{t("admin.serialNumber")}</label>
                   <input type="text" value={serialNumber} onChange={e => setSerialNumber(e.target.value)}
                     className="w-full border border-neutral-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-black" placeholder="SN-XXXX-XXXX" />
+                </div>
+                <div className="col-span-2">
+                  <div className="flex items-center gap-3 mb-2">
+                    <input type="checkbox" id="hasDiscount" checked={hasDiscount} onChange={e => { setHasDiscount(e.target.checked); if (!e.target.checked) setPriceAfterDiscount(""); }} className="w-4 h-4 cursor-pointer accent-green-600" />
+                    <label htmlFor="hasDiscount" className="text-sm font-bold cursor-pointer text-green-700">{t("admin.setDiscount") || "Set Discount on this product"}</label>
+                  </div>
+                  {hasDiscount && (
+                    <div className="mt-2">
+                      <label className="block text-sm font-semibold mb-1 text-green-700">{t("admin.priceAfterDiscount") || "Price After Discount"} ({t("common.currency")})</label>
+                      <input type="number" min="0" step="0.01" value={priceAfterDiscount} onChange={e => setPriceAfterDiscount(e.target.value)}
+                        className="w-full sm:w-1/2 border-2 border-green-300 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-green-500 bg-green-50 font-bold text-green-800" placeholder="e.g. 120" />
+                      {price && priceAfterDiscount && Number(priceAfterDiscount) < Number(price) && (
+                        <p className="text-xs text-green-600 font-bold mt-1">
+                          {t("admin.discountPercent") || "Discount"}: {Math.round(((Number(price) - Number(priceAfterDiscount)) / Number(price)) * 100)}%
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="col-span-2 sm:col-span-1">
                   <label className="block text-sm font-semibold mb-1">{t("admin.categoryStar")}</label>
@@ -337,7 +367,16 @@ export default function AdminProductsPage() {
                     </div>
                   </td>
                   <td className="p-4 text-neutral-600">{product.category?.name || "—"}</td>
-                  <td className="p-4 font-semibold">{product.price.toFixed(2)} {t("common.currency")}</td>
+                  <td className="p-4 font-semibold">
+                    {product.priceAfterDiscount != null && product.priceAfterDiscount > 0 && product.priceAfterDiscount < product.price ? (
+                      <div className="flex flex-col">
+                        <span className="line-through text-neutral-400 text-xs">{product.price.toFixed(2)} {t("common.currency")}</span>
+                        <span className="text-green-600 font-black">{product.priceAfterDiscount.toFixed(2)} {t("common.currency")}</span>
+                      </div>
+                    ) : (
+                      <span>{product.price.toFixed(2)} {t("common.currency")}</span>
+                    )}
+                  </td>
                   <td className="p-4">
                     <div className="flex flex-col gap-1">
                       <span className={`px-2 py-1 rounded-full text-[10px] w-fit font-bold uppercase ${product.stock > 0 ? "bg-green-50 text-green-700 border border-green-100" : "bg-red-50 text-red-600 border border-red-100"}`}>

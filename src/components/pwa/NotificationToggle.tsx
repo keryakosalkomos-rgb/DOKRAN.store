@@ -9,7 +9,7 @@ export default function NotificationToggle() {
   const [tokenFound, setTokenFound] = useState<boolean | null>(false);
   const [loading, setLoading] = useState(false);
   const [hasPermission, setHasPermission] = useState<NotificationPermission | null>(null);
-  const { lang } = useLanguage();
+  const { lang, t } = useLanguage();
   const isRTL = lang === 'ar';
 
   useEffect(() => {

@@ -70,10 +70,10 @@ export default function NotificationToggle() {
         <Bell className={`w-5 h-5 ${isRTL ? "ml-3" : "mr-3"}`} />
         <div>
           <span className="block font-black text-sm uppercase tracking-widest leading-none mb-1">
-            {isRTL ? "الإشعارات مفعلة" : "Push Enabled"}
+            {t("pwa.pushEnabled")}
           </span>
           <span className="block text-xs font-medium text-green-700/80">
-            {isRTL ? "ستتلقى تنبيهات بالطلبات والمحادثات." : "You will receive real-time updates."}
+            {t("pwa.pushEnabledDesc")}
           </span>
         </div>
       </div>
@@ -86,10 +86,10 @@ export default function NotificationToggle() {
         <BellOff className={`w-5 h-5 ${isRTL ? "ml-3" : "mr-3"}`} />
         <div>
           <span className="block font-black text-sm uppercase tracking-widest leading-none mb-1">
-            {isRTL ? "الإشعارات محظورة" : "Push Blocked"}
+            {t("pwa.pushBlocked")}
           </span>
           <span className="block text-xs font-medium text-red-700/80">
-            {isRTL ? "قم بتعديل إعدادات المتصفح للتفعيل." : "Allow notifications in browser settings."}
+            {t("pwa.pushBlockedDesc")}
           </span>
         </div>
       </div>
@@ -107,7 +107,7 @@ export default function NotificationToggle() {
       ) : (
         <Bell className={`w-5 h-5 ${isRTL ? "ml-2" : "mr-2"}`} />
       )}
-      {isRTL ? "تفعيل الإشعارات الآن" : "Enable Push Notifications"}
+      {t("pwa.enablePushNow")}
     </button>
   );
 }

@@ -17,6 +17,7 @@ export interface CartItem {
     uploadedDesignUrl?: string | null;
     aiPreviewUrl?: string | null;
   };
+  bulkOffers?: { quantity: number; price: number }[];
 }
 
 interface CartState {
@@ -27,6 +28,7 @@ interface CartState {
   clearCart: () => void;
   setItems: (items: CartItem[]) => void;
   cartTotal: () => number;
+  cartSubtotal: () => number;
 }
 
 export const useCartStore = create<CartState>()(
@@ -73,7 +75,45 @@ export const useCartStore = create<CartState>()(
       },
       clearCart: () => set({ items: [] }),
       setItems: (items) => set({ items }),
-      cartTotal: () => get().items.reduce((total, item) => total + item.price * item.quantity, 0),
+      cartSubtotal: () => get().items.reduce((total, item) => total + (item.price * item.quantity), 0),
+      cartTotal: () => {
+        const items = get().items;
+        
+        // Group items by product ID
+        const grouped = items.reduce((acc, item) => {
+          if (!acc[item.product]) {
+            acc[item.product] = {
+              totalQuantity: 0,
+              basePrice: item.price,
+              bulkOffers: item.bulkOffers || [],
+            };
+          }
+          acc[item.product].totalQuantity += item.quantity;
+          return acc;
+        }, {} as Record<string, { totalQuantity: number, basePrice: number, bulkOffers: any[] }>);
+
+        let total = 0;
+
+        for (const productId in grouped) {
+          const group = grouped[productId];
+          let groupTotal = group.totalQuantity * group.basePrice;
+
+          if (group.bulkOffers && group.bulkOffers.length > 0) {
+            const sortedOffers = [...group.bulkOffers].sort((a, b) => b.quantity - a.quantity);
+            for (const offer of sortedOffers) {
+              if (group.totalQuantity >= offer.quantity) {
+                const bundles = Math.floor(group.totalQuantity / offer.quantity);
+                const remainder = group.totalQuantity % offer.quantity;
+                groupTotal = (bundles * offer.price) + (remainder * group.basePrice);
+                break;
+              }
+            }
+          }
+          total += groupTotal;
+        }
+
+        return total;
+      },
     }),
     {
       name: "ds-cart-storage",

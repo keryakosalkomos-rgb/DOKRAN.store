@@ -72,7 +72,7 @@ export default function SizeGuideModal({ isOpen, onClose }: { isOpen: boolean, o
                 </div>
               ) : guides.length === 0 ? (
                 <div className="p-20 text-center text-neutral-500 font-medium">
-                  {isRTL ? "لا توجد أدلة مقاسات متاحة حالياً." : "No size guides available currently."}
+                  {t("products.noSizeGuides")}
                 </div>
               ) : (
                 <div className="flex flex-col flex-1 overflow-hidden">
@@ -132,9 +132,7 @@ export default function SizeGuideModal({ isOpen, onClose }: { isOpen: boolean, o
                             </table>
                           </div>
                           <p className="mt-6 text-sm text-neutral-400 text-center italic">
-                            {isRTL 
-                              ? "قد تختلف المقاسات بشكل طفيف من منتج لآخر. يرجى مراجعة تفاصيل المنتج للمزيد من الدقة."
-                              : "Sizes may vary slightly depending on the style. Please check product details for more accuracy."}
+                              {t("products.sizeVaryNote")}
                           </p>
                         </div>
                       );

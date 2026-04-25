@@ -41,7 +41,7 @@ export async function POST(request: Request) {
   }
   try {
     const body = await request.json();
-    const { name, description, price, priceAfterDiscount, category, stock, variants, images, isFeatured, serialNumber } = body;
+    const { name, description, price, priceAfterDiscount, category, stock, variants, images, isFeatured, serialNumber, bulkOffers } = body;
     if (!name || !description || !price || !category) {
       return NextResponse.json({ error: "Name, description, price and category are required" }, { status: 400 });
     }
@@ -59,6 +59,10 @@ export async function POST(request: Request) {
       images: images || [],
       isFeatured: isFeatured || false,
       serialNumber: serialNumber || "",
+      bulkOffers: bulkOffers || [],
+      visits: 0,
+      outOfStockAttempts: 0,
+      salesCount: 0,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString()
     };

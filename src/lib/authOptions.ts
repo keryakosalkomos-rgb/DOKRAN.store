@@ -19,6 +19,10 @@ export const authOptions: NextAuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID || "",
       clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
+      checks: ["pkce", "state"],
+      client: {
+        clockTolerance: 10800 // 3 hours in seconds
+      }
     }),
     CredentialsProvider({
       name: "Credentials",

@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useCartStore } from "@/store/useCartStore";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
-import { ArrowLeft, Check, Minus, Plus, ShoppingBag, Ruler } from "lucide-react";
+import { ArrowLeft, Check, Minus, Plus, ShoppingBag, Ruler, Zap, Package } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSession } from "next-auth/react";
 import SizeGuideModal from "@/components/products/SizeGuideModal";
+import BundleSelectorModal from "@/components/products/BundleSelectorModal";
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
@@ -27,6 +28,8 @@ export default function ProductDetailsPage() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
+  const [isBundleModalOpen, setIsBundleModalOpen] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState<any>(null);
 
   const addItem = useCartStore((state) => state.addItem);
 
@@ -70,6 +73,32 @@ export default function ProductDetailsPage() {
     };
     if (id) fetchProduct();
   }, [id]);
+
+  // Track product visit
+  useEffect(() => {
+    if (product?._id) {
+      fetch(`/api/products/${product._id}/analytics`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "visit" })
+      }).catch(console.error);
+    }
+  }, [product?._id]);
+
+  const handleOutOfStockClick = async () => {
+    if (!product?._id) return;
+    try {
+      await fetch(`/api/products/${product._id}/analytics`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "attempt" })
+      });
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -120,6 +149,7 @@ export default function ProductDetailsPage() {
       size: selectedSize || undefined,
       color: selectedColor || undefined,
       maxStock: maxAvailableStock,
+      bulkOffers: product.bulkOffers,
     }, maxAvailableStock);
 
     setTimeout(() => {
@@ -157,7 +187,7 @@ export default function ProductDetailsPage() {
         className="flex items-center text-sm font-bold text-neutral-500 hover:text-black mb-8 transition-colors"
       >
         <ArrowLeft className={`w-4 h-4 ${isRTL ? "ml-2 rotate-180" : "mr-2"}`} />
-        {isRTL ? "عودة للتشكيلة" : "Back to Collection"}
+        {t("products.backToCollection")}
       </button>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16">
@@ -251,6 +281,35 @@ export default function ProductDetailsPage() {
             {product.description}
           </p>
 
+          {/* Bulk Offers Display */}
+          {product.bulkOffers && product.bulkOffers.length > 0 && (
+            <div className="mb-8 space-y-3">
+              {product.bulkOffers.map((offer: any, idx: number) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setSelectedOffer(offer);
+                    setIsBundleModalOpen(true);
+                  }}
+                  className="w-full text-start p-4 bg-yellow-50 hover:bg-yellow-100 border border-yellow-200 rounded-2xl transition-all group flex items-center justify-between"
+                >
+                  <div>
+                    <h3 className="font-bold text-yellow-800 mb-1 flex items-center gap-2">
+                      <Zap className="w-4 h-4 text-yellow-600 group-hover:scale-110 transition-transform" />
+                      {t("products.specialOffer")}
+                    </h3>
+                    <p className="text-sm text-yellow-700 font-medium leading-relaxed">
+                      {t("products.bundleOfferDesc")?.replace("{{qty}}", offer.quantity.toString()).replace("{{price}}", offer.price.toString()).replace("{{originalPrice}}", (offer.quantity * product.price).toString()).replaceAll("{{currency}}", t("common.currency") || "")}
+                    </p>
+                  </div>
+                  <div className="hidden sm:flex shrink-0 w-10 h-10 rounded-full bg-white text-yellow-600 items-center justify-center shadow-sm font-black group-hover:bg-yellow-600 group-hover:text-white transition-colors">
+                    <ArrowLeft className={`w-5 h-5 ${isRTL ? "rotate-180" : ""}`} />
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className="w-full h-px bg-neutral-100 mb-8"></div>
 
           {/* Color Selection (Variants System) */}
@@ -324,7 +383,7 @@ export default function ProductDetailsPage() {
               <div className="flex justify-between items-center mb-4">
                 <span className="text-sm font-bold uppercase tracking-widest">{t("products.selectSize")}</span>
                 <div className="flex items-center gap-4">
-                  {!selectedColor && <span className="text-[10px] text-red-500 font-bold uppercase">Select color first</span>}
+                  {!selectedColor && <span className="text-[10px] text-red-500 font-bold uppercase">{t("products.selectColorFirst")}</span>}
                   <button 
                     onClick={() => setIsSizeGuideOpen(true)}
                     className="flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-indigo-600 hover:text-indigo-800 transition-colors bg-indigo-50 px-3 py-1.5 rounded-lg"
@@ -360,7 +419,7 @@ export default function ProductDetailsPage() {
                     );
                   })
                 ) : (
-                  <div className="text-sm text-neutral-400 font-medium italic">Please select a color to see available sizes.</div>
+                  <div className="text-sm text-neutral-400 font-medium italic">{t("products.pleaseSelectColor")}</div>
                 )}
               </div>
             </div>
@@ -418,8 +477,8 @@ export default function ProductDetailsPage() {
               {error}
             </div>
           )}
-          <div className={`flex flex-col sm:flex-row gap-4 pt-8 ${!error ? 'mt-auto' : ''}`}>
-            <div className="flex items-center justify-between border-2 border-neutral-200 rounded-full h-14 min-h-[56px] shrink-0 px-6 sm:w-1/3">
+          <div className={`flex flex-col sm:flex-row flex-wrap gap-4 pt-8 ${!error ? 'mt-auto' : ''}`}>
+            <div className="flex items-center justify-between border-2 border-neutral-200 rounded-full h-14 min-h-[56px] shrink-0 px-6 sm:w-auto min-w-[120px]">
               <button 
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 className="text-neutral-400 hover:text-black transition-colors"
@@ -437,34 +496,89 @@ export default function ProductDetailsPage() {
               </button>
             </div>
             
-            <button
-              onClick={handleAddToCart}
-              disabled={isAdding || isOutOfStock}
-              className={`w-full sm:flex-1 h-14 min-h-[56px] shrink-0 rounded-full font-black text-sm uppercase tracking-widest flex items-center justify-center transition-all ${
-                isOutOfStock
-                  ? "bg-neutral-200 text-neutral-400 cursor-not-allowed"
-                  : "bg-black text-white hover:bg-neutral-800 active:scale-[0.98] shadow-2xl shadow-black/20"
-              }`}
-            >
-              {isAdding ? (
-                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-              ) : showSuccess ? (
-                <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} className="flex items-center">
-                  <Check className="w-5 h-5 mr-2" /> {t("products.addSuccess")}
-                </motion.div>
-              ) : (
-                <div className="flex items-center">
-                  <ShoppingBag className={`w-5 h-5 ${isRTL ? "ml-2" : "mr-2"}`} />
-                  {isOutOfStock ? t("products.outOfStock") : t("products.addToCart")}
-                </div>
-              )}
-            </button>
+            {isOutOfStock ? (
+              <button
+                onClick={handleOutOfStockClick}
+                className="w-full sm:flex-1 h-14 min-h-[56px] shrink-0 rounded-full font-black text-sm uppercase tracking-widest flex items-center justify-center transition-all bg-neutral-100 text-neutral-600 hover:bg-neutral-200 border-2 border-neutral-200"
+              >
+                {showSuccess ? (
+                  <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} className="flex items-center">
+                    <Check className="w-5 h-5 mr-2" /> {t("products.interestRecorded")}
+                  </motion.div>
+                ) : (
+                  <div className="flex items-center">
+                    {t("products.outOfStock")} - {t("products.notifyMe")}
+                  </div>
+                )}
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={handleAddToCart}
+                  disabled={isAdding}
+                  className="w-full sm:flex-1 h-14 min-h-[56px] px-6 whitespace-nowrap shrink-0 rounded-full font-black text-sm uppercase tracking-widest flex items-center justify-center transition-all bg-black text-white hover:bg-neutral-800 active:scale-[0.98] shadow-2xl shadow-black/20"
+                >
+                  {isAdding ? (
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  ) : showSuccess ? (
+                    <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} className="flex items-center">
+                      <Check className="w-5 h-5 mr-2" /> {t("products.addSuccess")}
+                    </motion.div>
+                  ) : (
+                    <div className="flex items-center">
+                      <ShoppingBag className={`w-6 h-6 ${isRTL ? "ml-2" : "mr-2"}`} />
+                      {t("products.addToCart")}
+                    </div>
+                  )}
+                </button>
+                <button
+                  onClick={() => {
+                    handleAddToCart();
+                    setTimeout(() => router.push("/checkout"), 600);
+                  }}
+                  disabled={isAdding}
+                  className="w-full sm:flex-1 h-14 min-h-[56px] px-6 whitespace-nowrap shrink-0 rounded-full font-black text-sm uppercase tracking-widest flex items-center justify-center transition-all bg-indigo-600 text-white hover:bg-indigo-700 active:scale-[0.98] shadow-2xl shadow-indigo-600/20"
+                >
+                  <div className="flex items-center">
+                    <Zap className={`w-6 h-6 ${isRTL ? "ml-2" : "mr-2"}`} />
+                    {t("products.buyNow")}
+                  </div>
+                </button>
+                {product.bulkOffers && product.bulkOffers.length > 0 && (
+                  <button
+                    onClick={() => {
+                      setSelectedOffer(product.bulkOffers[0]);
+                      setIsBundleModalOpen(true);
+                    }}
+                    disabled={isAdding}
+                    className="w-full h-14 min-h-[56px] px-8 shrink-0 rounded-full font-black text-sm uppercase tracking-widest flex items-center justify-center transition-all bg-yellow-400 text-yellow-900 hover:bg-yellow-500 active:scale-[0.98] shadow-2xl shadow-yellow-400/20"
+                  >
+                    <div className="flex items-center">
+                      <Package className={`w-6 h-6 ${isRTL ? "ml-2" : "mr-2"}`} />
+                      {t("products.buyBundle")}
+                    </div>
+                  </button>
+                )}
+              </>
+            )}
           </div>
 
         </div>
       </div>
 
       <SizeGuideModal isOpen={isSizeGuideOpen} onClose={() => setIsSizeGuideOpen(false)} />
+      
+      {/* Bundle Selector Modal */}
+      <BundleSelectorModal 
+        isOpen={isBundleModalOpen} 
+        onClose={() => setIsBundleModalOpen(false)} 
+        product={product} 
+        offer={selectedOffer} 
+        onSuccess={() => {
+          setIsBundleModalOpen(false);
+          router.push("/checkout");
+        }} 
+      />
     </div>
   );
 }

@@ -25,7 +25,38 @@ export async function POST(req: Request) {
     const settingsSnap = await db.collection("settings").doc("payment").get();
     const fixedShippingPrice = settingsSnap.exists ? (Number(settingsSnap.data()?.fixedShippingPrice) || 0) : 0;
 
-    const actualItemsPrice = orderItems.reduce((acc: any, it: any) => acc + (it.price * it.quantity), 0);
+    // Group items by product ID to apply bulk offers correctly
+    const groupedItems = orderItems.reduce((acc: any, item: any) => {
+      if (!acc[item.product]) {
+        acc[item.product] = {
+          totalQuantity: 0,
+          basePrice: item.price,
+          bulkOffers: item.bulkOffers || [],
+        };
+      }
+      acc[item.product].totalQuantity += item.quantity;
+      return acc;
+    }, {});
+
+    let actualItemsPrice = 0;
+    for (const productId in groupedItems) {
+      const group = groupedItems[productId];
+      let groupTotal = group.totalQuantity * group.basePrice;
+
+      if (group.bulkOffers && group.bulkOffers.length > 0) {
+        const sortedOffers = [...group.bulkOffers].sort((a: any, b: any) => b.quantity - a.quantity);
+        for (const offer of sortedOffers) {
+          if (group.totalQuantity >= offer.quantity) {
+            const bundles = Math.floor(group.totalQuantity / offer.quantity);
+            const remainder = group.totalQuantity % offer.quantity;
+            groupTotal = (bundles * offer.price) + (remainder * group.basePrice);
+            break;
+          }
+        }
+      }
+      actualItemsPrice += groupTotal;
+    }
+
     const finalShippingPrice = shippingPrice !== undefined && shippingPrice !== 0 ? shippingPrice : fixedShippingPrice;
     const actualTotalPrice = actualItemsPrice + finalShippingPrice;
 

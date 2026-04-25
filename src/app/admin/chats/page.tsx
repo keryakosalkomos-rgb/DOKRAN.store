@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Loader2, MessageCircle, User as UserIcon, Search } from "lucide-react";
+import { Loader2, MessageCircle, User as UserIcon, Search, Trash2 } from "lucide-react";
 import ChatBox from "@/components/ui/ChatBox";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 
@@ -19,6 +19,7 @@ export default function AdminChatsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const isRTL = lang === "ar";
 
   useEffect(() => {
@@ -45,6 +46,24 @@ export default function AdminChatsPage() {
   );
 
   const selectedUser = users.find(u => u._id === selectedUserId);
+
+  const handleDeleteChat = async (e: React.MouseEvent, userId: string) => {
+    e.stopPropagation();
+    if (!confirm(isRTL ? "هل أنت متأكد من حذف هذه المحادثة؟" : "Are you sure you want to delete this chat?")) return;
+    
+    setDeletingUserId(userId);
+    try {
+      const res = await fetch(`/api/admin/chats/${userId}`, { method: "DELETE" });
+      if (res.ok) {
+        setUsers(users.filter(u => u._id !== userId));
+        if (selectedUserId === userId) setSelectedUserId(null);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDeletingUserId(null);
+    }
+  };
 
   return (
     <div className="h-[calc(100vh-140px)] flex flex-col" dir={isRTL ? "rtl" : "ltr"}>
@@ -95,10 +114,12 @@ export default function AdminChatsPage() {
               </div>
             ) : (
               filteredUsers.map((user) => (
-                <button
+                <div
                   key={user._id}
+                  role="button"
+                  tabIndex={0}
                   onClick={() => setSelectedUserId(user._id)}
-                  className={`w-full text-start p-4 md:p-5 transition-all hover:bg-neutral-50 active:scale-[0.98] ${
+                  className={`w-full text-start p-4 md:p-5 transition-all hover:bg-neutral-50 active:scale-[0.98] cursor-pointer ${
                     selectedUserId === user._id ? "bg-black/5" : ""
                   }`}
                 >
@@ -112,11 +133,25 @@ export default function AdminChatsPage() {
                         <p className="text-[10px] sm:text-xs text-neutral-400 truncate font-medium">{user.email}</p>
                       </div>
                     </div>
-                    {user.unreadCount > 0 && (
-                      <span className="shrink-0 bg-indigo-600 text-white text-[10px] font-black min-w-[20px] h-[20px] flex items-center justify-center rounded-full shadow-lg shadow-indigo-200">
-                        {user.unreadCount}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {user.unreadCount > 0 && (
+                        <span className="shrink-0 bg-indigo-600 text-white text-[10px] font-black min-w-[20px] h-[20px] flex items-center justify-center rounded-full shadow-lg shadow-indigo-200">
+                          {user.unreadCount}
+                        </span>
+                      )}
+                      <button
+                        onClick={(e) => handleDeleteChat(e, user._id)}
+                        disabled={deletingUserId === user._id}
+                        className="p-1.5 text-neutral-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        title={isRTL ? "حذف المحادثة" : "Delete Chat"}
+                      >
+                        {deletingUserId === user._id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                   {user.lastMessage && (
                     <p className={`text-xs mt-3 line-clamp-1 ps-[60px] ${user.unreadCount > 0 ? "font-black text-neutral-900" : "text-neutral-500 font-medium"}`}>
@@ -128,7 +163,7 @@ export default function AdminChatsPage() {
                       {new Date(user.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   )}
-                </button>
+                </div>
               ))
             )}
           </div>

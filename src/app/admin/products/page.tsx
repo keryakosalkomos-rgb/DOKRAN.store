@@ -12,7 +12,8 @@ interface Product {
 }
 
 export default function AdminProductsPage() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const isRTL = lang === "ar";
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +37,7 @@ export default function AdminProductsPage() {
   const [isFeatured, setIsFeatured] = useState(false);
   const [hasDiscount, setHasDiscount] = useState(false);
   const [priceAfterDiscount, setPriceAfterDiscount] = useState("");
+  const [bulkOffers, setBulkOffers] = useState<{quantity: number, price: number}[]>([]);
 
   useEffect(() => { fetchData(); }, []);
 
@@ -92,7 +94,7 @@ export default function AdminProductsPage() {
   const resetForm = () => {
     setName(""); setDescription(""); setPrice(""); setStock("0"); setSerialNumber(""); setMainCategoryId(""); setSubCategoryId("");
     setVariants([]); setSizeInput(""); setSizeQuantity("0"); setImages([]); setIsFeatured(false);
-    setHasDiscount(false); setPriceAfterDiscount("");
+    setHasDiscount(false); setPriceAfterDiscount(""); setBulkOffers([]);
     setCurrentVariantColor("#000000"); setError(""); setEditingId(null);
   };
 
@@ -119,7 +121,8 @@ export default function AdminProductsPage() {
         variants, 
         images, 
         isFeatured,
-        serialNumber
+        serialNumber,
+        bulkOffers
       }),
     });
     const data = await res.json();
@@ -155,6 +158,7 @@ export default function AdminProductsPage() {
       setHasDiscount(false);
       setPriceAfterDiscount("");
     }
+    setBulkOffers((product as any).bulkOffers || []);
     setShowForm(true);
   };
 
@@ -280,6 +284,46 @@ export default function AdminProductsPage() {
                           </div>
                         ))}
                       </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-6 pt-4 border-t">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold">{isRTL ? "عروض حزم الكميات (Bundle Offers)" : "Bundle Offers"}</h3>
+                    <p className="text-xs text-neutral-500">{isRTL ? "مثال: 5 قطع بسعر إجمالي 700 بدلاً من 1000" : "e.g. 5 items for a total of 700 instead of 1000"}</p>
+                  </div>
+                  <button type="button" onClick={() => setBulkOffers([...bulkOffers, { quantity: 2, price: 0 }])} className="px-4 py-2 bg-yellow-100 text-yellow-800 rounded-lg text-sm font-bold hover:bg-yellow-200 transition-all">{isRTL ? "إضافة عرض" : "Add Offer"}</button>
+                </div>
+                <div className="space-y-3">
+                  {bulkOffers.map((offer, oIdx) => (
+                    <div key={oIdx} className="flex items-center gap-3 bg-yellow-50/50 p-3 rounded-xl border border-yellow-100">
+                      <div className="flex-1">
+                        <label className="block text-[10px] font-bold text-yellow-800 uppercase mb-1">{isRTL ? "الكمية" : "Quantity"}</label>
+                        <input type="number" min="2" value={offer.quantity} onChange={e => {
+                          const newOffers = [...bulkOffers];
+                          newOffers[oIdx].quantity = parseInt(e.target.value) || 2;
+                          setBulkOffers(newOffers);
+                        }} className="w-full border border-yellow-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-yellow-500 bg-white" />
+                      </div>
+                      <div className="flex-1">
+                        <label className="block text-[10px] font-bold text-yellow-800 uppercase mb-1">{isRTL ? "السعر الإجمالي للكمية" : "Total Price for Bundle"}</label>
+                        <input type="number" min="0" step="0.01" value={offer.price} onChange={e => {
+                          const newOffers = [...bulkOffers];
+                          newOffers[oIdx].price = parseFloat(e.target.value) || 0;
+                          setBulkOffers(newOffers);
+                        }} className="w-full border border-yellow-200 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-yellow-500 bg-white" placeholder={isRTL ? "السعر الإجمالي" : "Total Price"} />
+                        {offer.quantity > 0 && price && (
+                          <p className="text-[10px] text-yellow-700 mt-1">
+                            {isRTL ? "بدلاً من" : "Instead of"}: {offer.quantity * Number(price)} {t("common.currency")}
+                          </p>
+                        )}
+                      </div>
+                      <button type="button" onClick={() => setBulkOffers(bulkOffers.filter((_, i) => i !== oIdx))} className="mt-5 p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   ))}
                 </div>

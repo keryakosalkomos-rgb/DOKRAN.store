@@ -12,7 +12,7 @@ export default function CheckoutPage() {
   const { t, lang } = useLanguage();
   const isRTL = lang === "ar";
   const router = useRouter();
-  const { items, cartTotal, clearCart } = useCartStore();
+  const { items, cartTotal, cartSubtotal, clearCart } = useCartStore();
   const { data: session, status } = useSession();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
@@ -272,7 +272,7 @@ export default function CheckoutPage() {
                   onChange={handleChange} 
                   className="w-full border rounded-md px-4 py-2 outline-none focus:ring-2 focus:ring-black bg-white"
                 >
-                  <option value="">{isRTL ? "اختر المحافظة" : "Select Governorate"}</option>
+                  <option value="">{t("checkout.selectGovernorate")}</option>
                   {governorates.map(gov => (
                     <option key={gov.id} value={gov.name}>
                       {isRTL ? gov.nameAr : gov.name}
@@ -425,8 +425,14 @@ export default function CheckoutPage() {
             <div className="space-y-3 text-sm border-t pt-4 mb-6">
               <div className="flex justify-between font-bold">
                 <span className="text-neutral-600">{t("cart.subtotal")}</span>
-                <span>{cartTotal()} {t("common.currency")}</span>
+                <span>{cartSubtotal()} {t("common.currency")}</span>
               </div>
+              {cartSubtotal() > cartTotal() && (
+                <div className="flex justify-between text-green-600 font-medium">
+                  <span>{t("checkout.bundleDiscount")}</span>
+                  <span>-{cartSubtotal() - cartTotal()} {t("common.currency")}</span>
+                </div>
+              )}
               <div className="flex justify-between items-center text-sm">
                 <span className="text-neutral-600">Shipping</span>
                 <span className="font-bold text-indigo-600">

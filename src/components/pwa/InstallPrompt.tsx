@@ -31,10 +31,10 @@ export default function InstallPrompt() {
               </div>
               <div>
                 <p className="text-xs font-black uppercase tracking-widest leading-none mb-1">
-                  {isRTL ? "تثبيت التطبيق" : "Install App"}
+                  {t("pwa.installApp")}
                 </p>
                 <p className="text-[10px] text-neutral-400 font-medium whitespace-nowrap">
-                  {isRTL ? "دخول أسرع وبدون إنترنت" : "Faster, seamless experience"}
+                  {t("pwa.installAppDesc")}
                 </p>
               </div>
             </div>
@@ -43,7 +43,7 @@ export default function InstallPrompt() {
                 onClick={installApp}
                 className="bg-white text-black text-[10px] font-black uppercase px-4 py-2 rounded-xl hover:scale-105 active:scale-95 transition-all shadow-lg"
               >
-                {isRTL ? "تثبيت" : "Install"}
+                {t("pwa.installBtn")}
               </button>
               <button onClick={() => setIsDismissed(true)} className="p-2 text-neutral-500 hover:text-white transition-colors">
                 <X className="w-4 h-4" />
@@ -77,25 +77,23 @@ export default function InstallPrompt() {
                 <Smartphone className="w-8 h-8 text-indigo-600" />
               </div>
               
-              <h3 className="text-xl font-black mb-2">{isRTL ? "أضف DOK-RAN لشاشتك" : "Add to Home Screen"}</h3>
+              <h3 className="text-xl font-black mb-2">{t("pwa.addToHomeScreen")}</h3>
               <p className="text-neutral-500 text-sm mb-8 leading-relaxed px-4">
-                {isRTL 
-                  ? "لتحصل على متعة التسوق الكاملة وتنبيهات فورية بطلباتك."
-                  : "To get the best experience and instant notifications for your custom orders."}
+                {t("pwa.iosDesc")}
               </p>
               
               <div className="space-y-4 text-left font-medium">
                  <div className="flex items-start gap-4 p-4 bg-neutral-50 rounded-2xl">
                     <span className="w-6 h-6 bg-white border rounded-full flex items-center justify-center text-xs font-black shrink-0">1</span>
                     <p className="text-xs text-neutral-600">
-                      {isRTL ? "اضغط على أيقونة 'مشاركة' في متصفح سفاري." : "Tap the 'Share' icon in the Safari toolbar."}
+                      {t("pwa.safariShareHint")}
                       <span className="inline-flex items-center ml-1 opacity-50"><Share className="w-3 h-3" /></span>
                     </p>
                  </div>
                  <div className="flex items-start gap-4 p-4 bg-neutral-50 rounded-2xl">
                     <span className="w-6 h-6 bg-white border rounded-full flex items-center justify-center text-xs font-black shrink-0">2</span>
                     <p className="text-xs text-neutral-600">
-                      {isRTL ? "مرر للأسفل واختر 'أضف إلى الصفحة الرئيسية'." : "Scroll down and tap 'Add to Home Screen'."}
+                      {t("pwa.safariAddHint")}
                     </p>
                  </div>
               </div>
@@ -104,7 +102,7 @@ export default function InstallPrompt() {
                 onClick={dismissIOSInstructions}
                 className="w-full mt-8 bg-black text-white py-4 rounded-2xl font-black shadow-lg hover:scale-[1.02] active:scale-95 transition-all text-sm"
               >
-                {isRTL ? "تم، فهمت!" : "Got it!"}
+                {t("pwa.gotIt")}
               </button>
             </div>
           </motion.div>

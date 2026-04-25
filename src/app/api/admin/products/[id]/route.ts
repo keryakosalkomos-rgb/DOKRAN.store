@@ -26,7 +26,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
   try {
     const { id } = await params;
     const body = await req.json();
-    const { name, description, price, priceAfterDiscount, category, stock, variants, images, isFeatured, serialNumber } = body;
+    const { name, description, price, priceAfterDiscount, category, stock, variants, images, isFeatured, serialNumber, bulkOffers } = body;
 
     const updateData: any = {
       name,
@@ -38,6 +38,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
       images: images || [],
       isFeatured: isFeatured || false,
       serialNumber: serialNumber || "",
+      bulkOffers: bulkOffers || [],
       updatedAt: new Date().toISOString()
     };
     if (priceAfterDiscount !== undefined && priceAfterDiscount !== null && priceAfterDiscount !== "") {

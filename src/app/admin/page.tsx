@@ -20,7 +20,9 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetch("/api/admin/dashboard").then(r => r.json()).then(d => {
-      if (d) setData(d);
+      if (d && !d.error) {
+        setData(prev => ({ ...prev, ...d }));
+      }
     }).catch(() => {});
   }, []);
 

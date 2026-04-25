@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, ShoppingCart, Package, Tags, Users, Settings, Globe, MessageCircle, LogOut } from "lucide-react";
+import { LayoutDashboard, ShoppingCart, Package, Tags, Users, Settings, Globe, MessageCircle, LogOut, Activity } from "lucide-react";
 import { useLanguage } from "@/lib/i18n/LanguageContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { signOut } from "next-auth/react";
@@ -23,6 +23,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { name: t("admin.sizeGuides"), href: "/admin/size-guides", icon: <Package className="w-5 h-5 shrink-0" /> },
     { name: t("admin.users"), href: "/admin/users", icon: <Users className="w-5 h-5 shrink-0" /> },
     { name: t("admin.homepage"), href: "/admin/homepage", icon: <Globe className="w-5 h-5 shrink-0" /> },
+    { name: t("admin.stockMonitoring") || (lang === "ar" ? "مراقبة المخزون" : "Stock Monitor"), href: "/admin/stock-monitoring", icon: <Activity className="w-5 h-5 shrink-0" /> },
     { name: t("admin.shipping"), href: "/admin/shipping", icon: <ShoppingCart className="w-5 h-5 shrink-0" /> },
     { name: t("admin.settings"), href: "/admin/settings", icon: <Settings className="w-5 h-5 shrink-0" /> },
   ];
